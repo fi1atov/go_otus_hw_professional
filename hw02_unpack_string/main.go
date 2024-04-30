@@ -31,9 +31,13 @@ func Unpack(s string) (r string, err error) {
 	var b strings.Builder
 	for _, char := range s {
 		fmt.Println(char, string(char))
-		fmt.Println(escaped)
+		// fmt.Println(escaped)
 		// предыдущий и текущий символы строки могут быть числами только если было экранирование
 		if unicode.IsDigit(prevChar) && unicode.IsDigit(char) && !ecran {
+			return r, ErrInvalidString
+		}
+		// если текущий символ не цифра и не слеш, и при этом есть экранирование - ошибка
+		if !unicode.IsDigit(char) && string(char) != "\\" && ecran {
 			return r, ErrInvalidString
 		}
 		if unicode.IsDigit(char) && !escaped {
@@ -65,6 +69,6 @@ func Unpack(s string) (r string, err error) {
 }
 
 func main() {
-	str := `qwe\45`
+	str := `qwe\\\3` // `qwe\3`
 	fmt.Println(Unpack(str))
 }
