@@ -40,23 +40,29 @@ func Unpack(s string) (r string, err error) {
 		if !unicode.IsDigit(char) && string(char) != "\\" && ecran {
 			return r, ErrInvalidString
 		}
-		if unicode.IsDigit(char) && !escaped {
-			m := int(char - '0') // превратить в число
-			if m == 0 {          // если пришел ноль - значит букву перед этим нулем нужно убрать
+
+		m := int(char - '0') // превратить в число
+		switch unicode.IsDigit(char) && !escaped {
+		case true:
+			if m == 0 {
+				// если пришел ноль - значит букву перед этим нулем нужно убрать
 				res := b.String()               // получаем строку из формируемого буфера
 				b.Reset()                       // очистить буфер
 				b.WriteString(res[:len(res)-1]) // убираем последний символ и перезаписываем буфер
-				continue
+			} else {
+				r := strings.Repeat(string(prev), m-1) // повторить символ на пришедшее число - 1, т.к. 1 символ уже вписан
+				b.WriteString(r)
+				if ecran {
+					ecran = false // экранированный символ записан - снять экранирование
+				}
 			}
-			r := strings.Repeat(string(prev), m-1) // повторить символ на пришедшее число - 1, т.к. 1 символ уже вписан
-			b.WriteString(r)
-			if ecran {
-				ecran = false // экранированный символ записан - снять экранирование
-			}
-		} else {
+		case false:
 			escaped = string(char) == "\\" && string(prev) != "\\"
 			if !escaped {
 				b.WriteRune(char)
+				// if ecran {
+				// 	ecran = false // экранированный символ записан - снять экранирование
+				// }
 			} else {
 				ecran = true // пришел символ экранирования
 			}
