@@ -27,29 +27,34 @@ func Unpack(s string) (r string, err error) {
 	var prev rune
 	var prevChar rune
 	var escaped bool
+	var ecran bool
 	var b strings.Builder
 	for _, char := range s {
-		// если предыдущий и текущий символы строки - это числа
-		if unicode.IsDigit(prevChar) && unicode.IsDigit(char) {
+		fmt.Println(char, string(char))
+		fmt.Println(escaped)
+		// предыдущий и текущий символы строки могут быть числами только если было экранирование
+		if unicode.IsDigit(prevChar) && unicode.IsDigit(char) && !ecran {
 			return r, ErrInvalidString
 		}
 		if unicode.IsDigit(char) && !escaped {
 			m := int(char - '0') // превратить в число
-			// fmt.Println("m", m)
-			if m == 0 {
-				res := b.String()
-				b.Reset()
-				b.WriteString(res[:len(res)-1])
+			if m == 0 {          // если пришел ноль - значит букву перед этим нулем нужно убрать
+				res := b.String()               // получаем строку из формируемого буфера
+				b.Reset()                       // очистить буфер
+				b.WriteString(res[:len(res)-1]) // убираем последний символ и перезаписываем буфер
 				continue
 			}
-			r := strings.Repeat(string(prev), m-1)
-			// fmt.Println("r", r)
+			r := strings.Repeat(string(prev), m-1) // повторить символ на пришедшее число - 1, т.к. 1 символ уже вписан
 			b.WriteString(r)
+			if ecran {
+				ecran = false // экранированный символ записан - снять экранирование
+			}
 		} else {
 			escaped = string(char) == "\\" && string(prev) != "\\"
 			if !escaped {
-				// fmt.Println(char)
 				b.WriteRune(char)
+			} else {
+				ecran = true // пришел символ экранирования
 			}
 			prev = char
 		}
@@ -60,6 +65,6 @@ func Unpack(s string) (r string, err error) {
 }
 
 func main() {
-	str := "d\n5abc"
+	str := `qwe\45`
 	fmt.Println(Unpack(str))
 }
