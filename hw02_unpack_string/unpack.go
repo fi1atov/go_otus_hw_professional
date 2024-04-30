@@ -58,17 +58,14 @@ func Unpack(s string) (r string, err error) {
 			}
 		case false:
 			escaped = string(char) == "\\" && string(prev) != "\\"
-			if !escaped {
-				b.WriteRune(char)
-				// if ecran {
-				// 	ecran = false // экранированный символ записан - снять экранирование
-				// }
-			} else {
+			if escaped {
 				ecran = true // пришел символ экранирования
+			} else {
+				b.WriteRune(char)
 			}
-			prev = char
+			prev = char // предыдущий литерал
 		}
-		prevChar = char
+		prevChar = char // предыдущий символ (и литералы и цифры)
 	}
 
 	return b.String(), err
