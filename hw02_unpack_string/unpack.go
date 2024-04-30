@@ -1,4 +1,4 @@
-package main
+package hw02unpackstring
 
 import (
 	"errors"
@@ -41,7 +41,7 @@ func Unpack(s string) (r string, err error) {
 			return r, ErrInvalidString
 		}
 
-		m := int(char - '0') // превратить в число
+		m := int(char - '0') // удобный способ превращения руны в число
 		switch unicode.IsDigit(char) && !escaped {
 		case true:
 			if m == 0 {
@@ -72,9 +72,4 @@ func Unpack(s string) (r string, err error) {
 	}
 
 	return b.String(), err
-}
-
-func main() {
-	str := `qwe\\\3` // `qwe\3`
-	fmt.Println(Unpack(str))
 }
