@@ -31,10 +31,6 @@ func Unpack(s string) (r string, err error) {
 	if char := rune(s[0]); unicode.IsDigit(char) {
 		return r, ErrInvalidString
 	}
-	// если последний символ строки - это символ экранирования
-	if sym := s[len(s)-1:]; sym == "\\" {
-		return r, ErrInvalidString
-	}
 
 	var prev rune
 	var prevPrevChar rune
@@ -78,6 +74,11 @@ func Unpack(s string) (r string, err error) {
 		// запоминать один предыдущий символ недостаточно - нужно запоминать два предущих символа
 		prevPrevChar = prev // предпредыдущий символ
 		prev = char         // предыдущий литерал
+	}
+
+	// если последний символ строки - это символ экранирования
+	if ecran {
+		return r, ErrInvalidString
 	}
 
 	return b.String(), err
