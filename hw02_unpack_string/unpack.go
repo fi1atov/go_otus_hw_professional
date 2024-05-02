@@ -33,17 +33,16 @@ func Unpack(s string) (r string, err error) {
 	}
 
 	var prev rune
-	var prevPrevChar rune
 	var escaped bool
-	var ecran bool
+	var ecranDigit bool
 	var b strings.Builder
 	for _, char := range s {
-		// если предыдущий и текущий символы являются цифрами и нет экранирования - ошибка
-		if string(prevPrevChar) != "\\" && unicode.IsDigit(prev) && unicode.IsDigit(char) {
+		// если предыдущий и текущий символы являются цифрами и не было экранирования - ошибка
+		if !escaped && !ecranDigit && unicode.IsDigit(prev) && unicode.IsDigit(char) {
 			return r, ErrInvalidString
 		}
 		// если текущий символ не цифра и не слеш, и при этом есть экранирование - ошибка
-		if !unicode.IsDigit(char) && string(char) != "\\" && ecran {
+		if !unicode.IsDigit(char) && string(char) != "\\" && escaped {
 			return r, ErrInvalidString
 		}
 
@@ -58,26 +57,21 @@ func Unpack(s string) (r string, err error) {
 			} else {
 				r := strings.Repeat(string(prev), m-1) // повторить символ на пришедшее число - 1, т.к. 1 символ уже вписан
 				b.WriteString(r)
-				if ecran {
-					ecran = false // экранированный символ записан - снять экранирование
-				}
 			}
 		case false:
-			escaped = string(char) == "\\" && !ecran
-			if escaped {
-				ecran = true // пришел символ экранирования
-			} else {
+			escaped = string(char) == "\\" && !escaped
+			if !escaped {
 				b.WriteRune(char)
-				ecran = false // экранирование тут 100% надо снимать
+			}
+			if !escaped && unicode.IsDigit(char) {
+				ecranDigit = true
 			}
 		}
-		// запоминать один предыдущий символ недостаточно - нужно запоминать два предущих символа
-		prevPrevChar = prev // предпредыдущий символ
-		prev = char         // предыдущий литерал
+		prev = char // предыдущий литерал
 	}
 
 	// если последний символ строки - это символ экранирования
-	if ecran {
+	if escaped {
 		return r, ErrInvalidString
 	}
 
