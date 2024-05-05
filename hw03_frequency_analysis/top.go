@@ -13,8 +13,11 @@ type Word struct {
 
 var sortedStruct []Word
 
+// Скомпилированное регулярное выражение на уровне пакета.
+var wordSplitRegex = regexp.MustCompile(`(?:\s-\s)|[,.\\s]+`)
+
 func separateRow(input string) []string {
-	return regexp.MustCompile(`(?:\s-\s)|[,.\\s]+`).Split(input, -1)
+	return wordSplitRegex.Split(input, -1)
 }
 
 func Top10(input string) []string {
