@@ -13,10 +13,14 @@ type Word struct {
 
 var sortedStruct []Word
 
+func separateRow(input string) []string {
+	return regexp.MustCompile(`(?:\s-\s)|[,.\\s]+`).Split(input, -1)
+}
+
 func Top10(input string) []string {
 	// 1. Отделить слова и превратить текст в слайс
 	dict := make(map[string]int)
-	words := regexp.MustCompile(`(?:\s-\s)|[,.\\s]+`).Split(input, -1)
+	words := separateRow(input)
 	wordsStr := strings.ToLower(strings.Join(words, " "))
 	// Избавляет от отступов, переноса строки, пробелов
 	words = strings.Fields(wordsStr)
