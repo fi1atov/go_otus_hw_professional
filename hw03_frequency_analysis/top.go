@@ -20,9 +20,9 @@ func separateRow(input string) []string {
 	return wordSplitRegex.Split(input, -1)
 }
 
-func Top10(input string) []string {
-	// 1. Отделить слова и превратить текст в слайс
+func CountWords(input string) map[string]int {
 	dict := make(map[string]int)
+	// Отделить слова и превратить текст в слайс
 	words := separateRow(input)
 	wordsStr := strings.ToLower(strings.Join(words, " "))
 	// Избавляет от отступов, переноса строки, пробелов
@@ -32,6 +32,12 @@ func Top10(input string) []string {
 	for _, word := range words {
 		dict[word]++
 	}
+	return dict
+}
+
+func Top10(input string) []string {
+	// посчитать количество повторений слова в тексте
+	dict := CountWords(input)
 	// мапа не имеет функции сортировки - нужно преобразовать ее в слайс структур
 	for key, value := range dict {
 		sortedStruct = append(sortedStruct, Word{key, value})
