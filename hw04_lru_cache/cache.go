@@ -22,19 +22,17 @@ type LruCache struct {
 }
 
 func (c *LruCache) Set(key Key, value interface{}) {
-
 	c.Lock()
 
 	defer c.Unlock()
 
 	c.items[key] = &ListItem{
 		Value: value,
-		Next: nil,
-		Prev: nil,
+		Next:  nil,
+		Prev:  nil,
 	}
 
 	c.queue.PushFront(value)
-
 }
 
 func NewCache(capacity int) LruCache {
