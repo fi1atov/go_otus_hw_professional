@@ -1,6 +1,6 @@
 package hw04lrucache
 
-type List interface {
+type ListMethods interface {
 	Len() int
 	Front() *ListItem
 	Back() *ListItem
@@ -18,29 +18,29 @@ type ListItem struct {
 }
 
 // Для списка нужно знать его длину, первый и последний элементы.
-type list struct {
+type List struct {
 	length int
 	first  *ListItem
 	last   *ListItem
 }
 
 // Получить количество элементов в списке.
-func (l *list) Len() int {
+func (l *List) Len() int {
 	return l.length
 }
 
 // Получить первый элемент из списка.
-func (l *list) Front() *ListItem {
+func (l *List) Front() *ListItem {
 	return l.first
 }
 
 // Получить последний элемент из списка.
-func (l *list) Back() *ListItem {
+func (l *List) Back() *ListItem {
 	return l.last
 }
 
 // Добавить значение в начало списка.
-func (l *list) PushFront(v interface{}) *ListItem {
+func (l *List) PushFront(v interface{}) *ListItem {
 	// Готовим элемент. Значение - полученный. Следующий элемент будет тот который сейчас первый в списке.
 	item := ListItem{Value: v, Next: l.first} // Если это первый вставляемый элемент - l.first будет nil
 	// Элемент готов к вставке - следущий элемент (Next) вставили
@@ -60,7 +60,7 @@ func (l *list) PushFront(v interface{}) *ListItem {
 }
 
 // Добавить значение в конец списка.
-func (l *list) PushBack(v interface{}) *ListItem {
+func (l *List) PushBack(v interface{}) *ListItem {
 	// Готовим элемент. Значение - полученный. Предыдущий элемент будет тот который сейчас последний в списке.
 	item := ListItem{Value: v, Prev: l.last}
 	// Если последний элемент в списке уже был - добираемся до него и в Next вставляем наш текущий элемент
@@ -78,7 +78,7 @@ func (l *list) PushBack(v interface{}) *ListItem {
 }
 
 // Удаление элемента из списка.
-func (l *list) Remove(i *ListItem) {
+func (l *List) Remove(i *ListItem) {
 	// получаем информацию из элемента
 	switch {
 	case i.Prev != nil && i.Next != nil: // - значит наш элемент где-то посередине
@@ -96,8 +96,8 @@ func (l *list) Remove(i *ListItem) {
 // проверяем что у предыдущего элемента, следующий записан наш
 // и что у последующего элемента, предыдущий записан наш
 // если так - то нужно предыдущему элементу установить следущий = текущему следующему
-// и следущему элементу установить предыдущий = текущему предыдущему
-func (l *list) removeFromMiddle(i *ListItem) {
+// и следущему элементу установить предыдущий = текущему предыдущему.
+func (l *List) removeFromMiddle(i *ListItem) {
 	if i.Prev.Next == i && i.Next.Prev == i {
 		i.Prev.Next, i.Next.Prev = i.Next, i.Prev
 		l.length--
@@ -109,7 +109,7 @@ func (l *list) removeFromMiddle(i *ListItem) {
 // если это так - нужно у этого следующего элемента стереть информацию о предыдущем(нашем) элементе
 // и при этом сообщить списку о том что первым элементом теперь является тот, который ранее был вторым
 // и уменьшаем length.
-func (l *list) removeFromFront(i *ListItem) {
+func (l *List) removeFromFront(i *ListItem) {
 	if i.Next.Prev == i {
 		i.Next.Prev, l.first = nil, i.Next
 		l.length--
@@ -121,7 +121,7 @@ func (l *list) removeFromFront(i *ListItem) {
 // если это так - нужно у этого предыдущего элемента стереть информацию о следующем(нашем) элементе
 // и при этом сообщить списку о том что последним элементом теперь является тот, который ранее был предпоследним
 // и уменьшаем length.
-func (l *list) removeFromBack(i *ListItem) {
+func (l *List) removeFromBack(i *ListItem) {
 	if i.Prev.Next == i {
 		i.Prev.Next, l.last = nil, i.Prev
 		l.length--
@@ -131,7 +131,7 @@ func (l *list) removeFromBack(i *ListItem) {
 // удаление из списка единственного элемента
 // если элемент одновременно и первый и последний - удаляем информацию из переменных списка first/last
 // и уменьшаем length до zero value (0).
-func (l *list) removeLast(i *ListItem) {
+func (l *List) removeLast(i *ListItem) {
 	if l.first == i && l.last == i {
 		l.first, l.last = nil, nil
 		l.length--
@@ -141,7 +141,7 @@ func (l *list) removeLast(i *ListItem) {
 // переместить элемент в начало.
 // Полученный элемент удаляем иеющимся методом
 // Далее идет код аналогичный вставке элемента в началою.
-func (l *list) MoveToFront(i *ListItem) {
+func (l *List) MoveToFront(i *ListItem) {
 	l.Remove(i)
 	item := ListItem{Next: l.first, Value: i.Value}
 	if l.last == nil {
@@ -154,6 +154,6 @@ func (l *list) MoveToFront(i *ListItem) {
 	l.length++
 }
 
-func NewList() *list {
-	return new(list)
+func NewList() List {
+	return List{}
 }

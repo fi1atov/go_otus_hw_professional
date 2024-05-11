@@ -2,6 +2,7 @@ package hw04lrucache
 
 type Key string
 
+// LRU - когда вытесняется элемент, к которому дольше всего не было обращений.
 type Cache interface {
 	Set(key Key, value interface{}) bool
 	Get(key Key) (interface{}, bool)
