@@ -34,7 +34,8 @@ func (c *lruCache) Set(key Key, value interface{}) bool {
 	// если емкость достигла предела - то перед вставкой нового элемента - удалить самый старый
 	if c.queue.Len() >= c.capacity {
 		c.queue.Remove(c.queue.Back()) // получаем последний элемент из списка и удаляем его из списка
-		delete(c.items, key)           // после удаления из списка - удалить из мапы
+		// TODO: тут вместо key нужно каким-то образом подставить ключ последнего элемента
+		delete(c.items, key) // после удаления из списка - удалить из мапы
 	}
 	item := c.queue.PushFront(value) // создать новый элемент в списке (и получить созданный элемент)
 	c.items[key] = item
@@ -59,9 +60,10 @@ func (c *lruCache) Clear() {
 
 	defer c.Unlock()
 
-	for k := range c.items {
-		delete(c.items, k)
-	}
+	// Если вы хотите очистить карту от всех значений, вы можете задать
+	// ее равной пустой карте того же типа. При этом будет создана новая
+	// пустая карта, а сборщик мусора очистит память от старой карты.
+	c.items = map[Key]*ListItem{}
 }
 
 func NewCache(capacity int) Cache {
