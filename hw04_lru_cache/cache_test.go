@@ -54,7 +54,7 @@ func TestCache(t *testing.T) {
 		require.Nil(t, val)
 	})
 
-	t.Run("purge logic", func(t *testing.T) {
+	t.Run("kick out because of size", func(t *testing.T) {
 		// на логику выталкивания элементов из-за размера очереди
 		// (например: n = 3, добавили 4 элемента - 1й из кэша вытолкнулся)
 		c := NewCache(3)
