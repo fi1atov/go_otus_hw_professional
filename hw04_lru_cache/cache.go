@@ -6,6 +6,11 @@ import (
 
 type Key string
 
+type elem struct {
+	Key   Key
+	Value interface{}
+}
+
 // LRU - когда вытесняется элемент, к которому дольше всего не было обращений.
 type Cache interface {
 	Set(key Key, value interface{}) bool
@@ -25,19 +30,22 @@ func (c *lruCache) Set(key Key, value interface{}) bool {
 
 	defer c.Unlock()
 
-	if _, found := c.items[key]; found { // если элемент найден в словаре
-		c.items[key].Value = value        // присвоили элементу новое значение
+	element := elem{Key: key, Value: value} // Готовим элемент к вставке в очередь
+	if _, found := c.items[key]; found {    // если элемент найден в словаре
+		c.items[key].Value = element      // присвоили элементу новое значение
 		c.queue.MoveToFront(c.items[key]) // подвинули найденный элемент в начало списка
 		return true                       // элемент был
 	}
 	// если элемент не найден в словаре - тогда это новый элемент который надо вставить
 	// если емкость достигла предела - то перед вставкой нового элемента - удалить самый старый
 	if c.queue.Len() >= c.capacity {
-		c.queue.Remove(c.queue.Back()) // получаем последний элемент из списка и удаляем его из списка
-		// TODO: тут вместо key нужно каким-то образом подставить ключ последнего элемента
-		delete(c.items, key) // после удаления из списка - удалить из мапы
+		// первым делом получить элемент (для последующего удаления из мапы) а только потом удалять его из очереди
+		// тут нужно подставить ключ последнего элемента. Ключ нужно взять из элемента очереди.
+		castedElement := c.queue.Back().Value.(elem) // берем интерфейс из очереди - его надо кастить чтобы добраться до ключа
+		c.queue.Remove(c.queue.Back())               // получаем последний элемент из списка и удаляем его из списка
+		delete(c.items, castedElement.Key)           // после удаления из списка - удалить из мапы
 	}
-	item := c.queue.PushFront(value) // создать новый элемент в списке (и получить созданный элемент)
+	item := c.queue.PushFront(element) // создать новый элемент в списке (и получить созданный элемент)
 	c.items[key] = item
 	return false // элемента не было
 }
@@ -49,7 +57,9 @@ func (c *lruCache) Get(key Key) (interface{}, bool) {
 
 	if _, found := c.items[key]; found { // если элемент найден в словаре
 		c.queue.MoveToFront(c.items[key]) // подвинули найденный элемент в начало списка
-		return c.items[key].Value, true   // вернули значение элемента и статус что он найден
+		// вернули значение элемента и статус что он найден
+		// В мапе находим по ключу элемент, но это интерфейс - кастим в структуру elem и только после этого берем Value
+		return c.items[key].Value.(elem).Value, true
 	}
 
 	return nil, false
