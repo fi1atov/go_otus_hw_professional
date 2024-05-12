@@ -76,64 +76,48 @@ func (l *list) PushBack(v interface{}) *ListItem {
 }
 
 // Удаление элемента из списка.
-func (l *list) Remove(i *ListItem) {
-	// получаем информацию из элемента
-	switch {
-	case i.Prev != nil && i.Next != nil: // - значит наш элемент где-то посередине
-		l.removeFromMiddle(i)
-	case i.Prev == nil && i.Next != nil: // - значит наш элемент первый
-		l.removeFromFront(i)
-	case i.Prev != nil && i.Next == nil: // - значит наш элемент последний
-		l.removeFromBack(i)
-	case i.Prev == nil && i.Next == nil: // - значит наш элемент единственный в списке
-		l.removeLast(i)
-	}
-}
-
 // удаление из списка элемента, который где-то посередине
 // проверяем что у предыдущего элемента, следующий записан наш
 // и что у последующего элемента, предыдущий записан наш
 // если так - то нужно предыдущему элементу установить следущий = текущему следующему
 // и следущему элементу установить предыдущий = текущему предыдущему.
-func (l *list) removeFromMiddle(i *ListItem) {
-	if i.Prev.Next == i && i.Next.Prev == i {
-		i.Prev.Next, i.Next.Prev = i.Next, i.Prev
-		l.length--
-	}
-}
 
 // удаление из списка первого элемента
 // смотрим какой элемент идет следующим - у него Prev должен быть равен нашему элементу
 // если это так - нужно у этого следующего элемента стереть информацию о предыдущем(нашем) элементе
 // и при этом сообщить списку о том что первым элементом теперь является тот, который ранее был вторым
 // и уменьшаем length.
-func (l *list) removeFromFront(i *ListItem) {
-	if i.Next.Prev == i {
-		i.Next.Prev, l.first = nil, i.Next
-		l.length--
-	}
-}
 
 // удаление из списка последнего элемента
 // смотрим какой элемент был предыдущим - у него Next должен быть равен нашему элементу
 // если это так - нужно у этого предыдущего элемента стереть информацию о следующем(нашем) элементе
 // и при этом сообщить списку о том что последним элементом теперь является тот, который ранее был предпоследним
 // и уменьшаем length.
-func (l *list) removeFromBack(i *ListItem) {
-	if i.Prev.Next == i {
-		i.Prev.Next, l.last = nil, i.Prev
-		l.length--
-	}
-}
 
 // удаление из списка единственного элемента
 // если элемент одновременно и первый и последний - удаляем информацию из переменных списка first/last
 // и уменьшаем length до zero value (0).
-func (l *list) removeLast(i *ListItem) {
-	if l.first == i && l.last == i {
-		l.first, l.last = nil, nil
-		l.length--
+func (l *list) Remove(i *ListItem) {
+	// получаем информацию из элемента
+	switch {
+	case i.Prev != nil && i.Next != nil: // - значит наш элемент где-то посередине
+		if i.Prev.Next == i && i.Next.Prev == i {
+			i.Prev.Next, i.Next.Prev = i.Next, i.Prev
+		}
+	case i.Prev == nil && i.Next != nil: // - значит наш элемент первый
+		if i.Next.Prev == i {
+			i.Next.Prev, l.first = nil, i.Next
+		}
+	case i.Prev != nil && i.Next == nil: // - значит наш элемент последний
+		if i.Prev.Next == i {
+			i.Prev.Next, l.last = nil, i.Prev
+		}
+	case i.Prev == nil && i.Next == nil: // - значит наш элемент единственный в списке
+		if l.first == i && l.last == i {
+			l.first, l.last = nil, nil
+		}
 	}
+	l.length--
 }
 
 // переместить элемент в начало.
