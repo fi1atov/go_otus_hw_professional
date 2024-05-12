@@ -59,6 +59,52 @@ func TestCache(t *testing.T) {
 		// (например: n = 3, добавили 4 элемента - 1й из кэша вытолкнулся)
 		c := NewCache(3)
 
+		wasInCache := c.Set("aaa", 100) // вставили 1й
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("bbb", 200) // вставили 2й
+		require.False(t, wasInCache)
+
+		wasInCache = c.Set("ccc", 300) // вставили 3й
+		require.False(t, wasInCache)
+
+		val, ok := c.Get("aaa") // далее разные операции со всеми кроме "ccc"
+		require.True(t, ok)
+		require.Equal(t, 100, val)
+
+		val, ok = c.Get("bbb")
+		require.True(t, ok)
+		require.Equal(t, 200, val)
+
+		wasInCache = c.Set("aaa", 500)
+		require.True(t, wasInCache)
+
+		wasInCache = c.Set("bbb", 600)
+		require.True(t, wasInCache)
+
+		val, ok = c.Get("aaa")
+		require.True(t, ok)
+		require.Equal(t, 500, val)
+
+		val, ok = c.Get("bbb")
+		require.True(t, ok)
+		require.Equal(t, 600, val)
+
+		wasInCache = c.Set("ddd", 400) // вставили 4й - "ccc" должен уйти
+		require.False(t, wasInCache)
+
+		val, ok = c.Get("ccc") // "ccc" должен отсутствовать
+		require.False(t, ok)
+		require.Nil(t, val)
+	})
+
+	t.Run("kick out because least recently used", func(t *testing.T) {
+		// на логику выталкивания давно используемых элементов
+		// (например: n = 3, добавили 3 элемента, обратились несколько раз к разным
+		// элементам: изменили значение, получили значение и пр. - добавили 4й элемент,
+		// из первой тройки вытолкнется тот элемент, что был затронут наиболее давно).
+		c := NewCache(3)
+
 		wasInCache := c.Set("aaa", 100)
 		require.False(t, wasInCache)
 
@@ -68,12 +114,9 @@ func TestCache(t *testing.T) {
 		wasInCache = c.Set("ccc", 300)
 		require.False(t, wasInCache)
 
-		wasInCache = c.Set("ddd", 400)
-		require.False(t, wasInCache)
-
 		val, ok := c.Get("aaa")
-		require.False(t, ok)
-		require.Nil(t, val)
+		require.True(t, ok)
+		require.Equal(t, 100, val)
 
 		val, ok = c.Get("bbb")
 		require.True(t, ok)
@@ -82,10 +125,6 @@ func TestCache(t *testing.T) {
 		val, ok = c.Get("ccc")
 		require.True(t, ok)
 		require.Equal(t, 300, val)
-
-		val, ok = c.Get("ddd")
-		require.True(t, ok)
-		require.Equal(t, 400, val)
 	})
 }
 
