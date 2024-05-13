@@ -64,9 +64,7 @@ func (l *list) PushBack(v interface{}) *ListItem {
 	// Если последний элемент в списке уже был - добираемся до него и в Next вставляем наш текущий элемент
 	if l.last != nil {
 		l.last.Next = &item
-	}
-	// Если у списка нет первого элемента - вставляемый элемент еще и является первым.
-	if l.first == nil { // (это условно)
+	} else { // Если у списка нет первого элемента - вставляемый элемент еще и является первым.
 		l.first = &item
 	}
 	l.last = &item // сообщим списку информацию о новом последнем элементе (это безусловно)
@@ -124,14 +122,17 @@ func (l *list) Remove(i *ListItem) {
 // Полученный элемент удаляем имеющимся методом
 // Далее идет код аналогичный вставке элемента в начало.
 func (l *list) MoveToFront(i *ListItem) {
-	l.Remove(i)
-	item := ListItem{Next: l.first, Value: i.Value}
-	if l.last == nil {
-		l.last = &item
+	// выход сразу, если элемент и так первый
+	if l.first != i {
+		l.Remove(i)
+		item := ListItem{Next: l.first, Value: i.Value}
+		if l.last == nil {
+			l.last = &item
+		}
+		l.first.Prev = &item
+		l.first = &item
+		l.length++
 	}
-	l.first.Prev = &item
-	l.first = &item
-	l.length++
 }
 
 func NewList() List {
