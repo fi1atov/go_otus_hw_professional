@@ -38,14 +38,17 @@ func TestList(t *testing.T) {
 		require.Equal(t, 7, l.Len())
 		require.Equal(t, 80, l.Front().Value)
 		require.Equal(t, 70, l.Back().Value)
+		require.Equal(t, 60, l.Front().Next.Value)
+		require.Equal(t, 30, l.Back().Prev.Prev.Value)
 
-		l.MoveToFront(l.Front()) // [80, 60, 40, 10, 30, 50, 70]
-		l.MoveToFront(l.Back())  // [70, 80, 60, 40, 10, 30, 50]
+		l.MoveToFront(l.Front())                // [80, 60, 40, 10, 30, 50, 70]
+		l.MoveToFront(l.Back())                 // [70, 80, 60, 40, 10, 30, 50]
+		l.MoveToFront(l.Front().Next.Next.Next) // [40, 70, 80, 60, 10, 30, 50]
 
 		elems := make([]int, 0, l.Len())
 		for i := l.Front(); i != nil; i = i.Next {
 			elems = append(elems, i.Value.(int))
 		}
-		require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
+		require.Equal(t, []int{40, 70, 80, 60, 10, 30, 50}, elems)
 	})
 }
