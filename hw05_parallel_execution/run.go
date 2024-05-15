@@ -10,9 +10,8 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 
 type Task func() error
 
-// Run will run slice of functions on workersCount workers while get maxErrors errors.
 func Run(functions []Task, workersCount int, maxErrors int) error {
-	tasksChan := make(chan Task) // чан для всех задач
+	tasksChan := make(chan Task) // канал для всех задач
 	resultsChan := make(chan error, workersCount-1)
 	closeChan := make(chan bool) // сигнальный канал для закрытия
 
@@ -22,6 +21,7 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 	// они зависают на <-tasksChan - ждут пока там задачи появятся
 	for i := 0; i < workersCount; i++ {
 		wg.Add(1)
+		fmt.Println("Запуск горутины-исполнителя")
 		go startWorker(tasksChan, resultsChan, closeChan, &wg)
 	}
 
@@ -37,6 +37,7 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 		fmt.Println("У нас всего заданий: - ", len(functions))
 		for i := 0; i < len(functions); i++ {
 			fmt.Println("Кладем задание в канал - ", i)
+			// time.Sleep(time.Millisecond * 2)
 			inProgress++
 			tasksChan <- functions[i]
 		}
@@ -51,7 +52,9 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 				errors++ // счетчик ошибок
 			}
 
+			// если счетчик заданий или ошибок достиг предела - закрыть канал
 			if counter == len(functions) || errors == maxErrors {
+				fmt.Println("Закрываем канал")
 				close(closeChan)
 				return counter, errorsSlice
 			} else if len(functions)-counter-inProgress > 0 {
@@ -64,7 +67,13 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 	wg.Wait()
 	fmt.Println(counter)
 	fmt.Println(errorsSlice)
-	return ErrErrorsLimitExceeded
+
+	// Если счетчик ошибок достиг предела - вернуть ошибку
+	if len(errorsSlice) == maxErrors {
+		return ErrErrorsLimitExceeded
+	}
+	// Иначе все задачи были выполнены
+	return nil
 }
 
 func startWorker(tasksChan <-chan Task, resultsChan chan<- error, closeChan <-chan bool, wg *sync.WaitGroup) {
@@ -74,7 +83,9 @@ func startWorker(tasksChan <-chan Task, resultsChan chan<- error, closeChan <-ch
 		select {
 		// ждет пока задача появятся
 		case task := <-tasksChan:
-			resultsChan <- task() // исполнение задачи
+			res := task()
+			fmt.Println("Результат исполнения - ", res)
+			resultsChan <- res // исполнение задачи
 		case <-closeChan:
 			return // канал закрылся - выходим из функции-исполнителя
 		}
