@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"time"
 )
 
 var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
@@ -38,7 +37,7 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 		fmt.Println("У нас всего заданий: - ", len(functions))
 		for i := 0; i < workersCount; i++ {
 			fmt.Println("Кладем задание в канал - ", i)
-			time.Sleep(time.Millisecond * 500)
+			// time.Sleep(time.Millisecond * 500)
 			inProgress++
 			tasksChan <- functions[i]
 			fmt.Println("I HERE")
