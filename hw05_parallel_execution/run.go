@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 )
 
 var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
@@ -27,7 +28,7 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 
 	// далее основная горутина должна закиндать в tasksChan задачи
 
-	counter, errorsSlice := func() (int, []error) {
+	_, errorsSlice := func() (int, []error) {
 		var errors int
 		var inProgress int
 		var counter int
@@ -35,14 +36,16 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 
 		// отправка задач в канал - почему то отправятся не все задачи
 		fmt.Println("У нас всего заданий: - ", len(functions))
-		for i := 0; i < len(functions); i++ {
+		for i := 0; i < workersCount; i++ {
 			fmt.Println("Кладем задание в канал - ", i)
-			// time.Sleep(time.Millisecond * 2)
+			time.Sleep(time.Millisecond * 500)
 			inProgress++
 			tasksChan <- functions[i]
+			fmt.Println("I HERE")
 		}
 
 		for {
+			fmt.Println("I NOT HERE")
 			err := <-resultsChan
 			inProgress--
 			counter++ // счетчик исполненных заданий
@@ -65,8 +68,6 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 	}()
 
 	wg.Wait()
-	fmt.Println(counter)
-	fmt.Println(errorsSlice)
 
 	// Если счетчик ошибок достиг предела - вернуть ошибку
 	if len(errorsSlice) == maxErrors {
