@@ -2,7 +2,6 @@ package hw05parallelexecution
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 )
 
@@ -21,30 +20,24 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 	// они зависают на <-tasksChan - ждут пока там задачи появятся
 	for i := 0; i < workersCount; i++ {
 		wg.Add(1)
-		fmt.Println("Запуск горутины-исполнителя")
 		go startWorker(tasksChan, resultsChan, closeChan, &wg)
 	}
 
 	// далее основная горутина должна закиндать в tasksChan задачи
 
-	_, errorsSlice := func() (int, []error) {
+	errorsSlice := func() []error {
 		var errors int
 		var inProgress int
 		var counter int
 		var errorsSlice []error
 
 		// отправка задач в канал - почему то отправятся не все задачи
-		fmt.Println("У нас всего заданий: - ", len(functions))
 		for i := 0; i < workersCount; i++ {
-			fmt.Println("Кладем задание в канал - ", i)
-			// time.Sleep(time.Millisecond * 500)
 			inProgress++
 			tasksChan <- functions[i]
-			fmt.Println("I HERE")
 		}
 
 		for {
-			fmt.Println("I NOT HERE")
 			err := <-resultsChan
 			inProgress--
 			counter++ // счетчик исполненных заданий
@@ -56,9 +49,8 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 
 			// если счетчик заданий или ошибок достиг предела - закрыть канал
 			if counter == len(functions) || errors == maxErrors {
-				fmt.Println("Закрываем канал")
 				close(closeChan)
-				return counter, errorsSlice
+				return errorsSlice
 			} else if len(functions)-counter-inProgress > 0 {
 				inProgress++
 				tasksChan <- functions[workersCount-1+counter]
@@ -83,9 +75,7 @@ func startWorker(tasksChan <-chan Task, resultsChan chan<- error, closeChan <-ch
 		select {
 		// ждет пока задача появятся
 		case task := <-tasksChan:
-			res := task()
-			fmt.Println("Результат исполнения - ", res)
-			resultsChan <- res // исполнение задачи
+			resultsChan <- task() // исполнение задачи
 		case <-closeChan:
 			return // канал закрылся - выходим из функции-исполнителя
 		}
