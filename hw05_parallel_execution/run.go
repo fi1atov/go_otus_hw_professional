@@ -31,7 +31,8 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 		var counter int
 		var errorsSlice []error
 
-		// отправка задач в канал - почему то отправятся не все задачи
+		// отправка задач в канал
+		// отправляем не все задачи - а то количество которое равно кол-ву созданных горутин
 		for i := 0; i < workersCount; i++ {
 			inProgress++
 			tasksChan <- functions[i]
@@ -51,7 +52,7 @@ func Run(functions []Task, workersCount int, maxErrors int) error {
 			if counter == len(functions) || errors == maxErrors {
 				close(closeChan)
 				return errorsSlice
-			} else if len(functions)-counter-inProgress > 0 {
+			} else if len(functions)-counter-inProgress > 0 { // а тут отправляем все остальные задачи
 				inProgress++
 				tasksChan <- functions[workersCount-1+counter]
 			}
