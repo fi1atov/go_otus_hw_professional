@@ -10,6 +10,9 @@ var ErrErrorsLimitExceeded = errors.New("errors limit exceeded")
 type Task func() error
 
 func Run(functions []Task, workersCount int, maxErrors int) error {
+	if maxErrors <= 0 {
+		return ErrErrorsLimitExceeded
+	}
 	tasksChan := make(chan Task) // канал для всех задач
 	resultsChan := make(chan error, workersCount-1)
 	closeChan := make(chan bool) // сигнальный канал для закрытия
