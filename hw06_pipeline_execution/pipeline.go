@@ -1,6 +1,6 @@
 package hw06pipelineexecution
 
-// конвеер обработки данных
+// конвеер обработки данных test
 
 type (
 	In  = <-chan interface{} // канал только на чтение
