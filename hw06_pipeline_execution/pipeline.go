@@ -1,7 +1,5 @@
 package hw06pipelineexecution
 
-import "sync"
-
 // конвеер обработки данных
 
 type (
@@ -24,7 +22,6 @@ type Stage func(in In) (out Out)
 // представляющих различные стадии обработки данных
 // Out - возвращается канал Out из которого можно прочитать результат.
 func ExecutePipeline(in In, done In, stages ...Stage) Out {
-	wg := sync.WaitGroup{}
 	outCh := in
 	// перебираем слайс функций
 	for _, stage := range stages {
@@ -32,10 +29,8 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 			bindCh := make(Bi) // создание каналаx через make, чтобы не было nil
 			// это промежуточный канал который контролируется горутиной,
 			// передающей данные с учетом возможного завершения работы через канал done.
-			wg.Add(1)
 
 			go func() { // запуск горутины внутри анонимной функции
-				defer wg.Done()
 				defer close(bindCh) // закрыть канал по завершении работы горутины
 
 				for { // В бесконечном цикле:
@@ -62,10 +57,6 @@ func ExecutePipeline(in In, done In, stages ...Stage) Out {
 			return stage(bindCh) // Вызываем функцию из слайса с новым каналом
 		}(outCh)
 	}
-
-	go func() {
-		wg.Wait()
-	}()
 
 	// возвращается последний канал, который был сформирован после всех стадий.
 	return outCh // Возвращаем последний выходной канал
