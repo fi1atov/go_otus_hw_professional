@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 )
@@ -24,7 +25,7 @@ func checkFromFile(offset, limit, fileSize int64) error {
 
 func Copy(fromPath, toPath string, offset, limit int64) error {
 	// получаем файл-источник
-	file, err := os.OpenFile(fromPath, os.O_RDONLY, 0o666)
+	file, err := os.OpenFile(fromPath, os.O_RDONLY, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return err
@@ -43,18 +44,21 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		return err
 	}
 
-	// прочитать файл-источник подготовить reader
-
 	// готовим writer
-	dst, err := os.CreateTemp("", "tmp")
+	dst, err := os.CreateTemp(toPath, "tmp")
 	if err != nil {
 		return err
 	}
+	defer dst.Close()
 
-	_, err = io.CopyN(dst, file, limit)
+	fmt.Println("file: ", file)
+	fmt.Println("dst: ", dst)
+
+	value, err := io.CopyN(dst, file, limit)
 	if err != nil {
 		return err
 	}
+	fmt.Println(value)
 
 	return nil
 }
