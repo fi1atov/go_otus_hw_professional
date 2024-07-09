@@ -54,6 +54,10 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 	fmt.Println("file: ", file)
 	fmt.Println("dst: ", dst)
 
+	if limit == 0 {
+		limit = fileInfo.Size()
+	}
+
 	value, err := io.CopyN(dst, file, limit)
 	if err != nil {
 		return err
