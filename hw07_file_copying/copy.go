@@ -2,9 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
+
+	"github.com/cheggaaa/pb/v3"
 )
 
 var (
@@ -23,12 +24,12 @@ func checkFromFile(offset, limit, fileSize int64) error {
 	return nil
 }
 
-func Copy(fromPath, toPath string, offset, limit int64) error {
+func Copy(fromPath, toPath string, offset, limit int64) (string, error) {
 	// получаем файл-источник
 	file, err := os.OpenFile(fromPath, os.O_RDONLY, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return err
+			return "", err
 		}
 		panic(err)
 	}
@@ -41,28 +42,43 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 
 	err = checkFromFile(offset, limit, fileInfo.Size())
 	if err != nil {
-		return err
+		return "", err
+	}
+
+	// двигаем указатель
+	_, err = file.Seek(offset, io.SeekStart)
+	if err != nil {
+		return "", err
 	}
 
 	// готовим writer
 	dst, err := os.CreateTemp(toPath, "tmp")
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer dst.Close()
 
-	fmt.Println("file: ", file)
-	fmt.Println("dst: ", dst)
-
-	if limit == 0 {
+	// для того чтобы при нуле читали все и чтобы избежать ошибку EOF
+	// при слишком большом лимите
+	if limit == 0 || limit > fileInfo.Size() {
 		limit = fileInfo.Size()
 	}
 
-	value, err := io.CopyN(dst, file, limit)
-	if err != nil {
-		return err
+	// для того чтобы избежать ошибку EOF
+	if offset != 0 && offset+limit > fileInfo.Size() {
+		limit = fileInfo.Size() - offset
 	}
-	fmt.Println(value)
 
-	return nil
+	bar := pb.Full.Start64(limit)
+	barReader := bar.NewProxyReader(file)
+
+	_, err = io.CopyN(dst, barReader, limit)
+
+	bar.Finish()
+
+	if err != nil {
+		return "", err
+	}
+
+	return dst.Name(), nil
 }

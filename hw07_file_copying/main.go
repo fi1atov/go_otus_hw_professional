@@ -19,7 +19,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	err := Copy(from, to, offset, limit)
+	_, err := Copy(from, to, offset, limit)
 	if err != nil {
 		log.Print("Ошибка копирования: ", err)
 		return
