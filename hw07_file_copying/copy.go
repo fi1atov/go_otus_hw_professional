@@ -52,9 +52,15 @@ func Copy(fromPath, toPath string, offset, limit int64) (string, error) {
 	}
 
 	// готовим writer
-	dst, err := os.CreateTemp(toPath, "tmp")
+	// получаем файл-назначение на чтение/запись + нужна очистка файла перед его заполнением
+	dst, err := os.OpenFile(toPath, os.O_RDWR|os.O_TRUNC, 0o666)
 	if err != nil {
-		return "", err
+		if os.IsNotExist(err) {
+			dst, err = os.CreateTemp("mydir", toPath)
+			if err != nil {
+				return "", err
+			}
+		}
 	}
 	defer dst.Close()
 
