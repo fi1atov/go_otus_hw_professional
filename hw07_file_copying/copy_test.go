@@ -17,7 +17,7 @@ func TestCopy(t *testing.T) {
 		{
 			desc:         "offset0_limit0",
 			fromPath:     "testdata/input.txt",
-			toPath:       "mydir",
+			toPath:       "out",
 			offset:       0,
 			limit:        0,
 			expectedFile: "testdata/out_offset0_limit0.txt",
@@ -25,7 +25,7 @@ func TestCopy(t *testing.T) {
 		{
 			desc:         "offset0_limit10",
 			fromPath:     "testdata/input.txt",
-			toPath:       "mydir",
+			toPath:       "out",
 			offset:       0,
 			limit:        10,
 			expectedFile: "testdata/out_offset0_limit10.txt",
@@ -33,7 +33,7 @@ func TestCopy(t *testing.T) {
 		{
 			desc:         "offset0_limit1000",
 			fromPath:     "testdata/input.txt",
-			toPath:       "mydir",
+			toPath:       "out",
 			offset:       0,
 			limit:        1000,
 			expectedFile: "testdata/out_offset0_limit1000.txt",
@@ -41,7 +41,7 @@ func TestCopy(t *testing.T) {
 		{
 			desc:         "offset0_limit10000",
 			fromPath:     "testdata/input.txt",
-			toPath:       "mydir",
+			toPath:       "out",
 			offset:       0,
 			limit:        10000,
 			expectedFile: "testdata/out_offset0_limit10000.txt",
@@ -49,7 +49,7 @@ func TestCopy(t *testing.T) {
 		{
 			desc:         "offset100_limit1000",
 			fromPath:     "testdata/input.txt",
-			toPath:       "mydir",
+			toPath:       "out",
 			offset:       100,
 			limit:        1000,
 			expectedFile: "testdata/out_offset100_limit1000.txt",
@@ -57,7 +57,7 @@ func TestCopy(t *testing.T) {
 		{
 			desc:         "offset6000_limit1000",
 			fromPath:     "testdata/input.txt",
-			toPath:       "mydir",
+			toPath:       "out",
 			offset:       6000,
 			limit:        1000,
 			expectedFile: "testdata/out_offset6000_limit1000.txt",
