@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"os"
 
@@ -71,7 +70,7 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 		// получим путь до текущей директории
 		path, err := os.Getwd()
 		if err != nil {
-			fmt.Println(err)
+			return err
 		}
 		// готовим writer
 		// создаем временный файл
@@ -80,7 +79,6 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 			return err
 		}
 		defer dst.Close()
-		fmt.Println(dst)
 	} else {
 		// не совпадает - временный файл не нужен - создаем сразу целевой файл
 		// готовим writer
@@ -90,15 +88,12 @@ func Copy(fromPath, toPath string, offset, limit int64) error {
 			return err
 		}
 		defer dst.Close()
-		fmt.Println(dst)
 	}
-	fmt.Println(dst)
 	bar := pb.Full.Start64(limit)
 	barReader := bar.NewProxyReader(file)
 
 	_, err = io.CopyN(dst, barReader, limit)
 	if err != nil {
-		fmt.Println("HELLO")
 		return err
 	}
 
