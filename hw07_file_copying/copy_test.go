@@ -68,12 +68,12 @@ func TestCopy(t *testing.T) {
 		tc := tc
 		t.Run(tc.desc, func(t *testing.T) {
 			// выполняем копирование
-			dstFile, err := Copy(tc.fromPath, tc.toPath, tc.offset, tc.limit)
+			err := Copy(tc.fromPath, tc.toPath, tc.offset, tc.limit)
 			// ошибок быть не должно
 			require.NoError(t, err)
 			// смотрим что там скопировалось и сверим с нашим ожиданием
 			// откроем первый файл
-			fileFirst, err := os.OpenFile(dstFile, os.O_RDONLY, 0)
+			fileFirst, err := os.OpenFile(tc.toPath, os.O_RDONLY, 0)
 			if err != nil {
 				panic(err)
 			}
@@ -101,7 +101,7 @@ func TestCopy(t *testing.T) {
 
 			// Удалим созданный во время теста файл
 			// (при необходимости просматривать файлы - закомментировать эту строку удаления)
-			os.Remove(dstFile)
+			os.Remove(tc.toPath)
 		})
 	}
 }

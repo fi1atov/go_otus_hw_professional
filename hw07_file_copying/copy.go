@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -24,12 +25,13 @@ func checkFromFile(offset, limit, fileSize int64) error {
 	return nil
 }
 
-func Copy(fromPath, toPath string, offset, limit int64) (string, error) {
+func Copy(fromPath, toPath string, offset, limit int64) error {
+	var dst *os.File
 	// получаем файл-источник
 	file, err := os.OpenFile(fromPath, os.O_RDONLY, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return "", err
+			return err
 		}
 		panic(err)
 	}
@@ -42,27 +44,14 @@ func Copy(fromPath, toPath string, offset, limit int64) (string, error) {
 
 	err = checkFromFile(offset, limit, fileInfo.Size())
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// двигаем указатель
 	_, err = file.Seek(offset, io.SeekStart)
 	if err != nil {
-		return "", err
+		return err
 	}
-
-	// готовим writer
-	// получаем файл-назначение на чтение/запись + нужна очистка файла перед его заполнением
-	dst, err := os.OpenFile(toPath, os.O_RDWR|os.O_TRUNC, 0o666)
-	if err != nil {
-		if os.IsNotExist(err) {
-			dst, err = os.CreateTemp("mydir", toPath)
-			if err != nil {
-				return "", err
-			}
-		}
-	}
-	defer dst.Close()
 
 	// для того чтобы при нуле читали все и чтобы избежать ошибку EOF
 	// при слишком большом лимите
@@ -75,16 +64,56 @@ func Copy(fromPath, toPath string, offset, limit int64) (string, error) {
 		limit = fileInfo.Size() - offset
 	}
 
+	// источник и назначение совпадают?
+	if fromPath == toPath {
+		// совпадают - надо создавать временный файл и копировать него
+		// вторым шагом - удаляем src-файл и создаем файл заново и наполняем его
+		// получим путь до текущей директории
+		path, err := os.Getwd()
+		if err != nil {
+			fmt.Println(err)
+		}
+		// готовим writer
+		// создаем временный файл
+		dst, err = os.CreateTemp(path, "*"+toPath)
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+		fmt.Println(dst)
+	} else {
+		// не совпадает - временный файл не нужен - создаем сразу целевой файл
+		// готовим writer
+		// получаем файл-назначение на чтение/запись + нужна очистка файла перед его заполнением
+		dst, err = os.Create(toPath)
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+		fmt.Println(dst)
+	}
+	fmt.Println(dst)
 	bar := pb.Full.Start64(limit)
 	barReader := bar.NewProxyReader(file)
 
 	_, err = io.CopyN(dst, barReader, limit)
+	if err != nil {
+		fmt.Println("HELLO")
+		return err
+	}
 
 	bar.Finish()
 
-	if err != nil {
-		return "", err
+	if fromPath == toPath {
+		err := os.Remove(fromPath)
+		if err != nil {
+			return err
+		}
+		err = os.Rename(dst.Name(), toPath)
+		if err != nil {
+			return err
+		}
 	}
 
-	return dst.Name(), nil
+	return nil
 }
