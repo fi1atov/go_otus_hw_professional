@@ -12,7 +12,7 @@ func main() {
 	// прочитать аргументы начиная со второго (чтобы не хватать путь к директории)
 	args := os.Args[1:]
 	// открываем директорию в которой находятся файлы-переменные окружения
-	env, err := ReadDir(args[0])
+	env, err := ReadEnvDir(args[0])
 	if err != nil {
 		printFatal(fmt.Errorf("go-envdir: ошибка: %w", err))
 	}
