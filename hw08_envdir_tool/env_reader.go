@@ -47,7 +47,6 @@ func ReadEnvDir(dir string) (Environment, error) {
 		}
 		result[file.Name()] = EnvValue{Value: value}
 	}
-
 	return result, nil
 }
 
