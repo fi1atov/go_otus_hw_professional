@@ -1,8 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/spf13/pflag"
@@ -26,6 +29,25 @@ func main() {
 	// Place your code here,
 	// P.S. Do not rush to throw context down, think think if it is useful with blocking operation?
 	address, timeout := getParams()
-	fmt.Println(address)
-	fmt.Println(timeout)
+
+	_, cancel := context.WithCancel(context.Background())
+
+	go listenSignals(cancel)
+
+	client := NewTelnetClient(address, timeout, os.Stdin, os.Stdout)
+	err := client.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+}
+
+func listenSignals(cancel context.CancelFunc) {
+	signals := make(chan os.Signal, 1)
+	// SIGINT посылается при нажатии Ctrl+C
+	// SIGTERM посылается при использовании команды kill
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	<-signals
+	cancel()
 }
