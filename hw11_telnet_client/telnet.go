@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io"
+	"log"
 	"net"
 	"time"
 )
@@ -32,11 +34,19 @@ type client struct {
 }
 
 func (c *client) Connect() error {
+	var err error
+	c.conn, err = net.DialTimeout("tcp", c.address, c.timeout)
+	if err != nil {
+		return fmt.Errorf("cannot connect: %w", err)
+	}
+	log.Printf("...Connected to %s\n", c.address)
+
 	return nil
 }
 
 func (c *client) Close() error {
-	return nil
+	c.closed = true
+	return c.conn.Close()
 }
 
 func (c *client) Send() error {
