@@ -30,7 +30,7 @@ func main() {
 	// P.S. Do not rush to throw context down, think think if it is useful with blocking operation?
 	address, timeout := getParams()
 
-	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 
 	go listenSignals(cancel)
 
@@ -40,6 +40,11 @@ func main() {
 		log.Fatal(err)
 	}
 	defer client.Close()
+
+	go send(client, cancel)
+	go receive(client, cancel)
+
+	<-ctx.Done()
 }
 
 func listenSignals(cancel context.CancelFunc) {
@@ -49,5 +54,21 @@ func listenSignals(cancel context.CancelFunc) {
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 
 	<-signals
+	cancel()
+}
+
+func send(client TelnetClient, cancel context.CancelFunc) {
+	err := client.Send()
+	if err != nil {
+		log.Println(err)
+	}
+	cancel()
+}
+
+func receive(client TelnetClient, cancel context.CancelFunc) {
+	err := client.Receive()
+	if err != nil {
+		log.Println(err)
+	}
 	cancel()
 }
