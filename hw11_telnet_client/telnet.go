@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -50,9 +52,53 @@ func (c *client) Close() error {
 }
 
 func (c *client) Send() error {
-	return nil
+	r := bufio.NewReader(c.in)
+	for {
+		str, err := r.ReadString('\n')
+		if errors.Is(err, io.EOF) {
+			log.Println("...EOF")
+			return nil
+		}
+		if err != nil {
+			return c.formatSendError(err)
+		}
+
+		_, err = c.conn.Write([]byte(str))
+		if err != nil {
+			return c.formatSendError(err)
+		}
+	}
 }
 
 func (c *client) Receive() error {
-	return nil
+	r := bufio.NewReader(c.conn)
+	for {
+		str, err := r.ReadString('\n')
+		if errors.Is(err, io.EOF) {
+			log.Println("...Connection was closed")
+			return nil
+		}
+		if err != nil {
+			return c.formatReceiveError(err)
+		}
+
+		_, err = c.out.Write([]byte(str))
+		if err != nil {
+			return c.formatReceiveError(err)
+		}
+	}
+}
+
+func (c *client) formatSendError(err error) error {
+	if c.closed {
+		return nil
+	}
+	return fmt.Errorf("cannot send: %w", err)
+}
+
+func (c *client) formatReceiveError(err error) error {
+	if c.closed {
+		return nil
+	}
+	return fmt.Errorf("cannot receive: %w", err)
 }
