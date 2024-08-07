@@ -13,9 +13,9 @@ import (
 
 func getParams() (address string, timeout time.Duration) {
 	var host, port string
+	pflag.DurationVarP(&timeout, "timeout", "t", 10*time.Second, "connection timeout")
 	pflag.StringVarP(&host, "host", "h", "", "host")
 	pflag.StringVarP(&port, "port", "p", "", "port")
-	pflag.DurationVarP(&timeout, "timeout", "t", 10*time.Second, "connection timeout")
 
 	pflag.Parse()
 	if host == "" || port == "" {
