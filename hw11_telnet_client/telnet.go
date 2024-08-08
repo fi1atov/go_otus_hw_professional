@@ -18,6 +18,8 @@ type TelnetClient interface {
 }
 
 func NewTelnetClient(address string, timeout time.Duration, in io.ReadCloser, out io.Writer) TelnetClient {
+	// возвращаем структуру(объект) которая имплементирует интерфейс
+	// т.к. все методы интерфейса имеют реализацию
 	return &client{
 		address: address,
 		timeout: timeout,
@@ -52,8 +54,10 @@ func (c *client) Close() error {
 }
 
 func (c *client) Send() error {
+	// создать буферезированный reader для stdin - как самый эффективный способ чтения
 	r := bufio.NewReader(c.in)
 	for {
+		// читать до переноса строки
 		str, err := r.ReadString('\n')
 		if errors.Is(err, io.EOF) {
 			log.Println("...EOF")
@@ -63,6 +67,7 @@ func (c *client) Send() error {
 			return c.formatSendError(err)
 		}
 
+		// записать данные в соединение
 		_, err = c.conn.Write([]byte(str))
 		if err != nil {
 			return c.formatSendError(err)
@@ -71,6 +76,7 @@ func (c *client) Send() error {
 }
 
 func (c *client) Receive() error {
+	// создать буферезированный reader для соединения
 	r := bufio.NewReader(c.conn)
 	for {
 		str, err := r.ReadString('\n')
@@ -82,6 +88,7 @@ func (c *client) Receive() error {
 			return c.formatReceiveError(err)
 		}
 
+		// записать данные в stdout
 		_, err = c.out.Write([]byte(str))
 		if err != nil {
 			return c.formatReceiveError(err)
