@@ -12,16 +12,14 @@ import (
 )
 
 func getParams() (address string, timeout time.Duration) {
-	var host, port string
 	pflag.DurationVarP(&timeout, "timeout", "t", 10*time.Second, "connection timeout")
-	pflag.StringVarP(&host, "host", "h", "", "host")
-	pflag.StringVarP(&port, "port", "p", "", "port")
 
 	pflag.Parse()
-	if host == "" || port == "" {
+	if pflag.NArg() != 2 {
 		log.Fatal("Please define address and port")
 	}
-	address = host + ":" + port
+	// с нуля начинаются параметры которые не имеют заранее заданных имен
+	address = pflag.Arg(0) + ":" + pflag.Arg(1)
 	return
 }
 
