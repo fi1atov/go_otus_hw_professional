@@ -49,51 +49,60 @@ func (c *client) Connect() error {
 }
 
 func (c *client) Close() error {
-	c.closed = true
-	return c.conn.Close()
+	if c.conn != nil {
+		c.closed = true
+		return c.conn.Close()
+	}
+	return errors.New("not opened connection")
 }
 
 func (c *client) Send() error {
-	// создать буферезированный reader для stdin - как самый эффективный способ чтения
-	r := bufio.NewReader(c.in)
-	for {
-		// читать до переноса строки
-		str, err := r.ReadString('\n')
-		if errors.Is(err, io.EOF) {
-			log.Println("...EOF")
-			return nil
-		}
-		if err != nil {
-			return c.formatSendError(err)
-		}
+	if c.conn != nil {
+		// создать буферезированный reader для stdin - как самый эффективный способ чтения
+		r := bufio.NewReader(c.in)
+		for {
+			// читать до переноса строки
+			str, err := r.ReadString('\n')
+			if errors.Is(err, io.EOF) {
+				log.Println("...EOF")
+				return nil
+			}
+			if err != nil {
+				return c.formatSendError(err)
+			}
 
-		// записать данные в соединение
-		_, err = c.conn.Write([]byte(str))
-		if err != nil {
-			return c.formatSendError(err)
+			// записать данные в соединение
+			_, err = c.conn.Write([]byte(str))
+			if err != nil {
+				return c.formatSendError(err)
+			}
 		}
 	}
+	return errors.New("not opened connection")
 }
 
 func (c *client) Receive() error {
-	// создать буферезированный reader для соединения
-	r := bufio.NewReader(c.conn)
-	for {
-		str, err := r.ReadString('\n')
-		if errors.Is(err, io.EOF) {
-			log.Println("...Connection was closed")
-			return nil
-		}
-		if err != nil {
-			return c.formatReceiveError(err)
-		}
+	if c.conn != nil {
+		// создать буферезированный reader для соединения
+		r := bufio.NewReader(c.conn)
+		for {
+			str, err := r.ReadString('\n')
+			if errors.Is(err, io.EOF) {
+				log.Println("...Connection was closed")
+				return nil
+			}
+			if err != nil {
+				return c.formatReceiveError(err)
+			}
 
-		// записать данные в stdout
-		_, err = c.out.Write([]byte(str))
-		if err != nil {
-			return c.formatReceiveError(err)
+			// записать данные в stdout
+			_, err = c.out.Write([]byte(str))
+			if err != nil {
+				return c.formatReceiveError(err)
+			}
 		}
 	}
+	return errors.New("not opened connection")
 }
 
 func (c *client) formatSendError(err error) error {
