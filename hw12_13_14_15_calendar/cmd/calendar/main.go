@@ -3,21 +3,24 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/http"
+	memorystorage "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/memory"
 )
+
+// go run cmd/calendar/*.go config=configs/config.toml
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "", "Path to configuration file")
 }
 
 func main() {
@@ -28,7 +31,11 @@ func main() {
 		return
 	}
 
-	config := NewConfig()
+	config, err := NewConfig(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(config)
 	logg := logger.New(config.Logger.Level)
 
 	storage := memorystorage.New()
