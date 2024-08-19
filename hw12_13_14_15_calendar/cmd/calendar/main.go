@@ -36,7 +36,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println(config)
-	logg := logger.New(config.Logger.Level)
+	logg := logger.New(config.Logger.Level, nil, config.Logger.File)
 
 	storage := memorystorage.New()
 	calendar := app.New(logg, storage)
