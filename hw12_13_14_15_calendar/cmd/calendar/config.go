@@ -56,7 +56,5 @@ func NewConfig(configFile string) (Config, error) {
 		return config, fmt.Errorf("failed to unmarshal configuration: %w", err)
 	}
 
-	// fmt.Println(config)
-
 	return config, nil
 }

@@ -17,7 +17,6 @@ func New(level string, output io.Writer, fileName string) *Logger {
 	if err != nil {
 		panic(fmt.Errorf("could not open log file: %w", err))
 	}
-	defer file.Close()
 
 	// Используем MultiWriter для записи логов и в файл, и в предоставленный output (например, os.Stdout).
 	writer := io.MultiWriter(file, output)

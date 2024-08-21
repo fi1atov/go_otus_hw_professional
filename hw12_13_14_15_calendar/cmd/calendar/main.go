@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -15,7 +16,7 @@ import (
 	memorystorage "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/memory"
 )
 
-// go run cmd/calendar/*.go config=configs/config.toml
+// go run cmd/calendar/*.go --config=configs/config.toml
 
 var configFile string
 
@@ -35,8 +36,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(config)
+	fmt.Println("HEEEEEELLLLOOOO")
 	logg := logger.New(config.Logger.Level, nil, config.Logger.File)
+	logg.Info("Hello5")
+	//logg.Error(config.HTTP.Host)
+	logg.Info("Hello4")
 
 	storage := memorystorage.New()
 	calendar := app.New(logg, storage)
