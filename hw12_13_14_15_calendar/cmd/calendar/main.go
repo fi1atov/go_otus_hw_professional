@@ -37,7 +37,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("HEEEEEELLLLOOOO")
-	logg := logger.New(config.Logger.Level, nil, config.Logger.File)
+	logg := logger.New(config.Logger.Level, os.Stdout, config.Logger.File)
 	logg.Info("Hello5")
 	//logg.Error(config.HTTP.Host)
 	logg.Info("Hello4")
