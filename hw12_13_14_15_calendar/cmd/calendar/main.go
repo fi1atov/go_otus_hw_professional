@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/initstoragesql"
 	"log"
 	"os"
 	"os/signal"
@@ -13,7 +13,6 @@ import (
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/memory"
 )
 
 // go run cmd/calendar/*.go --config=configs/config.toml
@@ -32,18 +31,23 @@ func main() {
 		return
 	}
 
+	mainCtx, cancel := context.WithCancel(context.Background())
+	go watchSignals(cancel)
+
 	config, err := NewConfig(configFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("HEEEEEELLLLOOOO")
-	logg := logger.New(config.Logger.Level, os.Stdout, config.Logger.File)
-	logg.Info("Hello5")
-	//logg.Error(config.HTTP.Host)
-	logg.Info("Hello4")
 
-	storage := memorystorage.New()
-	calendar := app.New(logg, storage)
+	logg := logger.New(config.Logger.Level, os.Stdout, config.Logger.File)
+
+	logg.Info("start calendar")
+
+	db, err := initstoragesql.New(mainCtx, config.Database.Inmem, config.Database.Connect)
+	if err != nil {
+		logg.Error("err")
+	}
+	calendar := app.New(logg, db)
 
 	server := internalhttp.NewServer(logg, calendar)
 
@@ -69,4 +73,12 @@ func main() {
 		cancel()
 		os.Exit(1) //nolint:gocritic
 	}
+}
+
+func watchSignals(cancel context.CancelFunc) {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	<-signals
+	cancel()
 }

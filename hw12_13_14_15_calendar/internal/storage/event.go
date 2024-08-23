@@ -6,11 +6,6 @@ import (
 	"time"
 )
 
-type Storage interface {
-	Base
-	Events
-}
-
 type Base interface {
 	Connect(ctx context.Context, connect string) error
 	Close(ctx context.Context) error
