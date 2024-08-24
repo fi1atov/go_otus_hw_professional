@@ -11,7 +11,7 @@ type Logger struct {
 	logger *slog.Logger
 }
 
-func New(level string, output io.Writer, fileName string) *Logger {
+func New(level string, output io.Writer, fileName string) Logger {
 	// Открываем файл для записи логов. Если файл существует, он будет открыт в режиме добавления.
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o666)
 	if err != nil {
@@ -36,7 +36,7 @@ func New(level string, output io.Writer, fileName string) *Logger {
 		opts.Level = slog.LevelInfo // уровень по умолчанию.
 	}
 	logger := slog.New(slog.NewTextHandler(writer, &opts))
-	return &Logger{logger: logger}
+	return Logger{logger: logger}
 }
 
 func (l Logger) Debug(msg string) {

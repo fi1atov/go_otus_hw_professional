@@ -16,7 +16,7 @@ type Storage struct {
 	data   data
 }
 
-func New() storage.Storage {
+func New() *Storage {
 	result := Storage{}
 	result.data = make(data)
 	return &result
