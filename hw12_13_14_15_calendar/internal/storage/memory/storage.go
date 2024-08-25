@@ -10,7 +10,6 @@ import (
 type data map[int]storage.Event
 
 type Storage struct {
-	// TODO
 	mu     sync.RWMutex //nolint:unused
 	lastID int
 	data   data
@@ -139,12 +138,12 @@ func (s *Storage) ListMonth(_ context.Context, date time.Time) ([]storage.Event,
 	return result, nil
 }
 
-func (s *Storage) IsTimeBusy(_ context.Context, start, stop time.Time, excludeID int) (bool, error) {
+func (s *Storage) IsTimeBusy(_ context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	for _, event := range s.data {
-		if event.ID != excludeID && event.Start.Before(stop) && event.Stop.After(start) {
+		if event.UserID == userID && event.ID != excludeID && event.Start.Before(stop) && event.Stop.After(start) {
 			return true, nil
 		}
 	}

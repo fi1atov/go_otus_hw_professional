@@ -14,7 +14,7 @@ var ErrDateBusy = errors.New("this time is already occupied by another event")
 
 type App struct {
 	logger  Logger
-	storage Storage
+	storage storage.Storage
 }
 
 type Logger interface {
@@ -24,12 +24,7 @@ type Logger interface {
 	Error(msg string)
 }
 
-type Storage interface {
-	storage.Base
-	storage.Events
-}
-
-func New(logger Logger, storage Storage) App {
+func New(logger Logger, storage storage.Storage) App {
 	return App{
 		logger,
 		storage,
@@ -52,7 +47,7 @@ func (a *App) CreateEvent(ctx context.Context, userID int, title, desc string, s
 		err = ErrStartInPast
 		return
 	}
-	isBusy, err := a.storage.IsTimeBusy(ctx, start, stop, 0)
+	isBusy, err := a.storage.IsTimeBusy(ctx, userID, start, stop, 0)
 	if err != nil {
 		return
 	}
@@ -81,7 +76,7 @@ func (a *App) UpdateEvent(ctx context.Context, id int, change storage.Event) err
 	if time.Now().After(change.Start) {
 		return ErrStartInPast
 	}
-	isBusy, err := a.storage.IsTimeBusy(ctx, change.Start, change.Stop, id)
+	isBusy, err := a.storage.IsTimeBusy(ctx, change.UserID, change.Start, change.Stop, id)
 	if err != nil {
 		return err
 	}
