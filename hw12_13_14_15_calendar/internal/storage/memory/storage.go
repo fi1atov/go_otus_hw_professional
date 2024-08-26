@@ -9,27 +9,21 @@ import (
 
 type data map[int]storage.Event
 
-type Storage struct {
+type store struct {
 	mu     sync.RWMutex //nolint:unused
 	lastID int
 	data   data
 }
 
-func New() *Storage {
-	result := Storage{}
-	result.data = make(data)
-	return &result
-}
-
-func (s *Storage) Connect(_ context.Context, _ string) error {
+func (s *store) Connect(_ context.Context, _ string) error {
 	return nil
 }
 
-func (s *Storage) Close(_ context.Context) error {
+func (s *store) Close(_ context.Context) error {
 	return nil
 }
 
-func (s *Storage) Create(_ context.Context, event storage.Event) (int, error) {
+func (s *store) Create(_ context.Context, event storage.Event) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -47,7 +41,7 @@ func (s *Storage) Create(_ context.Context, event storage.Event) (int, error) {
 	return id, nil
 }
 
-func (s *Storage) Update(_ context.Context, id int, change storage.Event) error {
+func (s *store) Update(_ context.Context, id int, change storage.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -66,7 +60,7 @@ func (s *Storage) Update(_ context.Context, id int, change storage.Event) error 
 	return nil
 }
 
-func (s *Storage) Delete(_ context.Context, id int) error {
+func (s *store) Delete(_ context.Context, id int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -74,7 +68,7 @@ func (s *Storage) Delete(_ context.Context, id int) error {
 	return nil
 }
 
-func (s *Storage) DeleteAll(_ context.Context) error {
+func (s *store) DeleteAll(_ context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -82,7 +76,7 @@ func (s *Storage) DeleteAll(_ context.Context) error {
 	return nil
 }
 
-func (s *Storage) ListAll(_ context.Context) ([]storage.Event, error) {
+func (s *store) ListAll(_ context.Context) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -93,7 +87,7 @@ func (s *Storage) ListAll(_ context.Context) ([]storage.Event, error) {
 	return result, nil
 }
 
-func (s *Storage) ListDay(_ context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListDay(_ context.Context, date time.Time) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -108,7 +102,7 @@ func (s *Storage) ListDay(_ context.Context, date time.Time) ([]storage.Event, e
 	return result, nil
 }
 
-func (s *Storage) ListWeek(_ context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListWeek(_ context.Context, date time.Time) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -123,7 +117,7 @@ func (s *Storage) ListWeek(_ context.Context, date time.Time) ([]storage.Event, 
 	return result, nil
 }
 
-func (s *Storage) ListMonth(_ context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListMonth(_ context.Context, date time.Time) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -138,7 +132,7 @@ func (s *Storage) ListMonth(_ context.Context, date time.Time) ([]storage.Event,
 	return result, nil
 }
 
-func (s *Storage) IsTimeBusy(_ context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
+func (s *store) IsTimeBusy(_ context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -150,7 +144,7 @@ func (s *Storage) IsTimeBusy(_ context.Context, userID int, start, stop time.Tim
 	return false, nil
 }
 
-func (s *Storage) newID() int {
+func (s *store) newID() int {
 	s.lastID++
 	return s.lastID
 }

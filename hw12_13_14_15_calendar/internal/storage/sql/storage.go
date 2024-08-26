@@ -8,15 +8,11 @@ import (
 	"time"
 )
 
-type Storage struct {
+type store struct {
 	db *sql.DB
 }
 
-func New() *Storage {
-	return &Storage{}
-}
-
-func (s *Storage) Connect(ctx context.Context, connect string) error {
+func (s *store) Connect(ctx context.Context, connect string) error {
 	db, err := sql.Open("pgx", connect)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
@@ -25,11 +21,11 @@ func (s *Storage) Connect(ctx context.Context, connect string) error {
 	return s.db.PingContext(ctx)
 }
 
-func (s *Storage) Close(_ context.Context) error {
+func (s *store) Close(_ context.Context) error {
 	return s.db.Close()
 }
 
-func (s *Storage) Create(ctx context.Context, event storage.Event) (int, error) {
+func (s *store) Create(ctx context.Context, event storage.Event) (int, error) {
 	var query string
 	var args []interface{}
 	if event.Notification != nil {
@@ -55,7 +51,7 @@ func (s *Storage) Create(ctx context.Context, event storage.Event) (int, error) 
 	return id, nil
 }
 
-func (s *Storage) Update(ctx context.Context, id int, change storage.Event) error {
+func (s *store) Update(ctx context.Context, id int, change storage.Event) error {
 	var query string
 	var args []interface{}
 	if change.Notification != nil {
@@ -95,7 +91,7 @@ func (s *Storage) Update(ctx context.Context, id int, change storage.Event) erro
 	return nil
 }
 
-func (s *Storage) Delete(ctx context.Context, id int) error {
+func (s *store) Delete(ctx context.Context, id int) error {
 	query := `
 		DELETE FROM event
 		WHERE event_id = $1
@@ -107,7 +103,7 @@ func (s *Storage) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (s *Storage) DeleteAll(ctx context.Context) error {
+func (s *store) DeleteAll(ctx context.Context) error {
 	query := `
 		TRUNCATE TABLE event RESTART IDENTITY
 	`
@@ -118,7 +114,7 @@ func (s *Storage) DeleteAll(ctx context.Context) error {
 	return nil
 }
 
-func (s *Storage) ListAll(ctx context.Context) ([]storage.Event, error) {
+func (s *store) ListAll(ctx context.Context) ([]storage.Event, error) {
 	query := `
 		SELECT event_id, title, start, stop, description, user_id, notification
 		FROM event
@@ -127,7 +123,7 @@ func (s *Storage) ListAll(ctx context.Context) ([]storage.Event, error) {
 	return s.queryList(ctx, query)
 }
 
-func (s *Storage) ListDay(ctx context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListDay(ctx context.Context, date time.Time) ([]storage.Event, error) {
 	year, month, day := date.Date()
 	query := `
 		SELECT event_id, title, start, stop, description, user_id, notification
@@ -138,7 +134,7 @@ func (s *Storage) ListDay(ctx context.Context, date time.Time) ([]storage.Event,
 	return s.queryList(ctx, query, year, month, day)
 }
 
-func (s *Storage) ListWeek(ctx context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListWeek(ctx context.Context, date time.Time) ([]storage.Event, error) {
 	year, week := date.ISOWeek()
 	query := `
 		SELECT event_id, title, start, stop, description, user_id, notification
@@ -149,7 +145,7 @@ func (s *Storage) ListWeek(ctx context.Context, date time.Time) ([]storage.Event
 	return s.queryList(ctx, query, year, week)
 }
 
-func (s *Storage) ListMonth(ctx context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListMonth(ctx context.Context, date time.Time) ([]storage.Event, error) {
 	year, month, _ := date.Date()
 	query := `
 		SELECT event_id, title, start, stop, description, user_id, notification
@@ -160,7 +156,7 @@ func (s *Storage) ListMonth(ctx context.Context, date time.Time) ([]storage.Even
 	return s.queryList(ctx, query, year, month)
 }
 
-func (s *Storage) queryList(ctx context.Context, query string, args ...interface{}) (result []storage.Event, resultErr error) {
+func (s *store) queryList(ctx context.Context, query string, args ...interface{}) (result []storage.Event, resultErr error) {
 	// проверка есть, чего линтер хочет непонятно
 	//nolint:rowserrcheck
 	rows, err := s.db.QueryContext(ctx, query, args...)
@@ -202,7 +198,7 @@ func (s *Storage) queryList(ctx context.Context, query string, args ...interface
 	return
 }
 
-func (s *Storage) IsTimeBusy(ctx context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
+func (s *store) IsTimeBusy(ctx context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
 	query := `
 		SELECT Count(*) AS count
 		FROM event

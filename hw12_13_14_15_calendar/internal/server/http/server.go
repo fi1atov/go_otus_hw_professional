@@ -10,21 +10,15 @@ import (
 	"time"
 )
 
-type Server struct {
+type server struct {
 	app    app.App
 	logger logger.Logger
 	srv    *http.Server
 	mux    *http.ServeMux
 }
 
-type Logger interface { // TODO
-}
-
-type Application interface { // TODO
-}
-
-func NewServer(app app.App, logger logger.Logger) *Server {
-	s := &Server{
+func newServer(app app.App, logger logger.Logger) *server {
+	s := &server{
 		app:    app,
 		logger: logger,
 		mux:    http.NewServeMux(),
@@ -33,7 +27,7 @@ func NewServer(app app.App, logger logger.Logger) *Server {
 	return s
 }
 
-func (s *Server) Start(ctx context.Context, addr string) error {
+func (s *server) Start(addr string) error {
 	s.srv = &http.Server{
 		Addr:         addr,
 		Handler:      s.mux,
@@ -46,11 +40,10 @@ func (s *Server) Start(ctx context.Context, addr string) error {
 	if errors.Is(err, http.ErrServerClosed) {
 		return nil
 	}
-	<-ctx.Done()
 	return err
 }
 
-func (s *Server) Stop(ctx context.Context) error {
+func (s *server) Stop(ctx context.Context) error {
 	err := s.srv.Shutdown(ctx)
 	if err != nil {
 		return fmt.Errorf("server shutdown: %w", err)
@@ -58,6 +51,6 @@ func (s *Server) Stop(ctx context.Context) error {
 	return nil
 }
 
-func (s *Server) configureRouter() {
+func (s *server) configureRouter() {
 	s.mux.HandleFunc("GET /hello", loggingMiddleware(s.handleHello, s.logger))
 }

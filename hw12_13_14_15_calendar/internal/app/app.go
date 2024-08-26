@@ -2,36 +2,17 @@ package app
 
 import (
 	"context"
-	"errors"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"time"
 )
 
-var ErrNoUserID = errors.New("no user id of the event")
-var ErrEmptyTitle = errors.New("no title of the event")
-var ErrStartInPast = errors.New("start time of the event in the past")
-var ErrDateBusy = errors.New("this time is already occupied by another event")
-
-type App struct {
-	logger  Logger
+type app struct {
+	logger  logger.Logger
 	storage storage.Storage
 }
 
-type Logger interface {
-	Debug(msg string)
-	Info(msg string)
-	Warn(msg string)
-	Error(msg string)
-}
-
-func New(logger Logger, storage storage.Storage) App {
-	return App{
-		logger,
-		storage,
-	}
-}
-
-func (a *App) CreateEvent(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error) {
+func (a *app) Create(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error) {
 	if userID == 0 {
 		err = ErrNoUserID
 		return
@@ -66,7 +47,7 @@ func (a *App) CreateEvent(ctx context.Context, userID int, title, desc string, s
 	})
 }
 
-func (a *App) UpdateEvent(ctx context.Context, id int, change storage.Event) error {
+func (a *app) Update(ctx context.Context, id int, change storage.Event) error {
 	if change.Title == "" {
 		return ErrEmptyTitle
 	}
@@ -87,22 +68,22 @@ func (a *App) UpdateEvent(ctx context.Context, id int, change storage.Event) err
 	return a.storage.Update(ctx, id, change)
 }
 
-func (a *App) DeleteEvent(ctx context.Context, id int) error {
+func (a *app) Delete(ctx context.Context, id int) error {
 	return a.storage.Delete(ctx, id)
 }
 
-func (a *App) ListAllEvents(ctx context.Context) ([]storage.Event, error) {
+func (a *app) ListAll(ctx context.Context) ([]storage.Event, error) {
 	return a.storage.ListAll(ctx)
 }
 
-func (a *App) ListDayEvents(ctx context.Context, date time.Time) ([]storage.Event, error) {
+func (a *app) ListDay(ctx context.Context, date time.Time) ([]storage.Event, error) {
 	return a.storage.ListDay(ctx, date)
 }
 
-func (a *App) ListWeekEvents(ctx context.Context, date time.Time) ([]storage.Event, error) {
+func (a *app) ListWeek(ctx context.Context, date time.Time) ([]storage.Event, error) {
 	return a.storage.ListWeek(ctx, date)
 }
 
-func (a *App) ListMonthEvents(ctx context.Context, date time.Time) ([]storage.Event, error) {
+func (a *app) ListMonth(ctx context.Context, date time.Time) ([]storage.Event, error) {
 	return a.storage.ListMonth(ctx, date)
 }
