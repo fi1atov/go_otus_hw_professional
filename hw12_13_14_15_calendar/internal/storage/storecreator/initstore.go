@@ -1,4 +1,4 @@
-package initstoragesql
+package storecreator
 
 import (
 	"context"

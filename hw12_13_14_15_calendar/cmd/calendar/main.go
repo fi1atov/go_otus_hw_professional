@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/initstoragesql"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
 	"log"
 	"os"
 	"os/signal"
@@ -43,7 +43,7 @@ func main() {
 
 	logg.Info("start calendar")
 
-	db, err := initstoragesql.New(mainCtx, config.Database.Inmem, config.Database.Connect)
+	db, err := storecreator.New(mainCtx, config.Database.Inmem, config.Database.Connect)
 	if err != nil {
 		logg.Error("err")
 	}

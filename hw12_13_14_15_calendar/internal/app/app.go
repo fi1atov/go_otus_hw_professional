@@ -12,7 +12,7 @@ type app struct {
 	storage storage.Storage
 }
 
-func (a *app) Create(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error) {
+func (a *app) CreateEvent(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error) {
 	if userID == 0 {
 		err = ErrNoUserID
 		return
@@ -28,7 +28,7 @@ func (a *app) Create(ctx context.Context, userID int, title, desc string, start,
 		err = ErrStartInPast
 		return
 	}
-	isBusy, err := a.storage.IsTimeBusy(ctx, userID, start, stop, 0)
+	isBusy, err := a.storage.IsTimeBusyEvent(ctx, userID, start, stop, 0)
 	if err != nil {
 		return
 	}
@@ -37,7 +37,7 @@ func (a *app) Create(ctx context.Context, userID int, title, desc string, start,
 		return
 	}
 
-	return a.storage.Create(ctx, storage.Event{
+	return a.storage.CreateEvent(ctx, storage.Event{
 		Title:        title,
 		Start:        start,
 		Stop:         stop,
@@ -47,7 +47,7 @@ func (a *app) Create(ctx context.Context, userID int, title, desc string, start,
 	})
 }
 
-func (a *app) Update(ctx context.Context, id int, change storage.Event) error {
+func (a *app) UpdateEvent(ctx context.Context, id int, change storage.Event) error {
 	if change.Title == "" {
 		return ErrEmptyTitle
 	}
@@ -57,7 +57,7 @@ func (a *app) Update(ctx context.Context, id int, change storage.Event) error {
 	if time.Now().After(change.Start) {
 		return ErrStartInPast
 	}
-	isBusy, err := a.storage.IsTimeBusy(ctx, change.UserID, change.Start, change.Stop, id)
+	isBusy, err := a.storage.IsTimeBusyEvent(ctx, change.UserID, change.Start, change.Stop, id)
 	if err != nil {
 		return err
 	}
@@ -65,25 +65,25 @@ func (a *app) Update(ctx context.Context, id int, change storage.Event) error {
 		return ErrDateBusy
 	}
 
-	return a.storage.Update(ctx, id, change)
+	return a.storage.UpdateEvent(ctx, id, change)
 }
 
-func (a *app) Delete(ctx context.Context, id int) error {
-	return a.storage.Delete(ctx, id)
+func (a *app) DeleteEvent(ctx context.Context, id int) error {
+	return a.storage.DeleteEvent(ctx, id)
 }
 
-func (a *app) ListAll(ctx context.Context) ([]storage.Event, error) {
-	return a.storage.ListAll(ctx)
+func (a *app) ListAllEvent(ctx context.Context) ([]storage.Event, error) {
+	return a.storage.ListAllEvent(ctx)
 }
 
-func (a *app) ListDay(ctx context.Context, date time.Time) ([]storage.Event, error) {
-	return a.storage.ListDay(ctx, date)
+func (a *app) ListDayEvent(ctx context.Context, date time.Time) ([]storage.Event, error) {
+	return a.storage.ListDayEvent(ctx, date)
 }
 
-func (a *app) ListWeek(ctx context.Context, date time.Time) ([]storage.Event, error) {
-	return a.storage.ListWeek(ctx, date)
+func (a *app) ListWeekEvent(ctx context.Context, date time.Time) ([]storage.Event, error) {
+	return a.storage.ListWeekEvent(ctx, date)
 }
 
-func (a *app) ListMonth(ctx context.Context, date time.Time) ([]storage.Event, error) {
-	return a.storage.ListMonth(ctx, date)
+func (a *app) ListMonthEvent(ctx context.Context, date time.Time) ([]storage.Event, error) {
+	return a.storage.ListMonthEvent(ctx, date)
 }

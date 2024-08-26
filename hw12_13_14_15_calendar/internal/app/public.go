@@ -11,13 +11,13 @@ import (
 type ListEvents func(ctx context.Context, date time.Time) ([]storage.Event, error)
 
 type App interface {
-	Create(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error)
-	Update(ctx context.Context, id int, change storage.Event) error
-	Delete(ctx context.Context, id int) error
-	ListAll(ctx context.Context) ([]storage.Event, error)
-	ListDay(ctx context.Context, date time.Time) ([]storage.Event, error)
-	ListWeek(ctx context.Context, date time.Time) ([]storage.Event, error)
-	ListMonth(ctx context.Context, date time.Time) ([]storage.Event, error)
+	CreateEvent(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error)
+	UpdateEvent(ctx context.Context, id int, change storage.Event) error
+	DeleteEvent(ctx context.Context, id int) error
+	ListAllEvent(ctx context.Context) ([]storage.Event, error)
+	ListDayEvent(ctx context.Context, date time.Time) ([]storage.Event, error)
+	ListWeekEvent(ctx context.Context, date time.Time) ([]storage.Event, error)
+	ListMonthEvent(ctx context.Context, date time.Time) ([]storage.Event, error)
 }
 
 func New(logger logger.Logger, storage storage.Storage) App {

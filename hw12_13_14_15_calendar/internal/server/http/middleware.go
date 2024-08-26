@@ -3,8 +3,8 @@ package internalhttp
 import (
 	"fmt"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	"net"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -29,7 +29,13 @@ func loggingMiddleware(next http.HandlerFunc, logger logger.Logger) http.Handler
 }
 
 func requestAddr(r *http.Request) string {
-	return strings.Split(r.RemoteAddr, ":")[0]
+	// обрабатывает как IPv4, так и IPv6 адреса
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		// В случае ошибки возвращаем пустую строку
+		return ""
+	}
+	return host
 }
 
 func userAgent(r *http.Request) string {

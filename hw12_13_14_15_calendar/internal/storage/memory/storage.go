@@ -23,7 +23,7 @@ func (s *store) Close(_ context.Context) error {
 	return nil
 }
 
-func (s *store) Create(_ context.Context, event storage.Event) (int, error) {
+func (s *store) CreateEvent(_ context.Context, event storage.Event) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -41,7 +41,7 @@ func (s *store) Create(_ context.Context, event storage.Event) (int, error) {
 	return id, nil
 }
 
-func (s *store) Update(_ context.Context, id int, change storage.Event) error {
+func (s *store) UpdateEvent(_ context.Context, id int, change storage.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -60,7 +60,7 @@ func (s *store) Update(_ context.Context, id int, change storage.Event) error {
 	return nil
 }
 
-func (s *store) Delete(_ context.Context, id int) error {
+func (s *store) DeleteEvent(_ context.Context, id int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -68,15 +68,7 @@ func (s *store) Delete(_ context.Context, id int) error {
 	return nil
 }
 
-func (s *store) DeleteAll(_ context.Context) error {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.data = make(data)
-	return nil
-}
-
-func (s *store) ListAll(_ context.Context) ([]storage.Event, error) {
+func (s *store) ListAllEvent(_ context.Context) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -87,7 +79,7 @@ func (s *store) ListAll(_ context.Context) ([]storage.Event, error) {
 	return result, nil
 }
 
-func (s *store) ListDay(_ context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListDayEvent(_ context.Context, date time.Time) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -102,7 +94,7 @@ func (s *store) ListDay(_ context.Context, date time.Time) ([]storage.Event, err
 	return result, nil
 }
 
-func (s *store) ListWeek(_ context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListWeekEvent(_ context.Context, date time.Time) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -117,7 +109,7 @@ func (s *store) ListWeek(_ context.Context, date time.Time) ([]storage.Event, er
 	return result, nil
 }
 
-func (s *store) ListMonth(_ context.Context, date time.Time) ([]storage.Event, error) {
+func (s *store) ListMonthEvent(_ context.Context, date time.Time) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -132,7 +124,7 @@ func (s *store) ListMonth(_ context.Context, date time.Time) ([]storage.Event, e
 	return result, nil
 }
 
-func (s *store) IsTimeBusy(_ context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
+func (s *store) IsTimeBusyEvent(_ context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
