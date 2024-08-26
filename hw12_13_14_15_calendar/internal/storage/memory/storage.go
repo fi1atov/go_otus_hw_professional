@@ -2,15 +2,16 @@ package memorystorage
 
 import (
 	"context"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"sync"
 	"time"
+
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 )
 
 type data map[int]storage.Event
 
 type store struct {
-	mu     sync.RWMutex //nolint:unused
+	mu     sync.RWMutex
 	lastID int
 	data   data
 }

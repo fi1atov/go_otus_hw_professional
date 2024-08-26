@@ -2,9 +2,10 @@ package app
 
 import (
 	"context"
+	"time"
+
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
-	"time"
 )
 
 type app struct {
@@ -12,7 +13,13 @@ type app struct {
 	storage storage.Storage
 }
 
-func (a *app) CreateEvent(ctx context.Context, userID int, title, desc string, start, stop time.Time, notif *time.Duration) (id int, err error) {
+func (a *app) CreateEvent(
+	ctx context.Context,
+	userID int,
+	title, desc string,
+	start, stop time.Time,
+	notif *time.Duration,
+) (id int, err error) {
 	if userID == 0 {
 		err = ErrNoUserID
 		return

@@ -4,8 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"time"
+
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 )
 
 type store struct {
@@ -145,7 +146,11 @@ func (s *store) ListMonthEvent(ctx context.Context, date time.Time) ([]storage.E
 	return s.queryList(ctx, query, year, month)
 }
 
-func (s *store) queryList(ctx context.Context, query string, args ...interface{}) (result []storage.Event, resultErr error) {
+func (s *store) queryList(
+	ctx context.Context,
+	query string,
+	args ...interface{},
+) (result []storage.Event, resultErr error) {
 	// проверка есть, чего линтер хочет непонятно
 	//nolint:rowserrcheck
 	rows, err := s.db.QueryContext(ctx, query, args...)

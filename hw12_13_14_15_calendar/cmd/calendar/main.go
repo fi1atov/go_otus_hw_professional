@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
 	"log"
 	"os"
 	"os/signal"
@@ -13,6 +12,7 @@ import (
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
 )
 
 // go run cmd/calendar/*.go --config=configs/config.toml

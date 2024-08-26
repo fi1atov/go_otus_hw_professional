@@ -2,10 +2,11 @@ package internalhttp
 
 import (
 	"fmt"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
 	"net"
 	"net/http"
 	"time"
+
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
 )
 
 func loggingMiddleware(next http.HandlerFunc, logger logger.Logger) http.HandlerFunc {
