@@ -5,9 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/app"
 )
 
 type CreateEventTest struct {
@@ -57,7 +56,7 @@ func (s *CreateEventTest) TestCreateEventForOtherUser() {
 	_, err := s.AddEvent(event)
 	s.Require().NoError(err)
 
-	event.UserID = event.UserID + 1
+	event.UserID++
 	_, err = s.AddEvent(event)
 	s.Require().NoError(err)
 }
@@ -104,7 +103,7 @@ func (s *CreateEventTest) TestCreateEventFailDateBusy() {
 func (s *CreateEventTest) AddEventForTime(start, stop time.Time) error {
 	event := s.NewCommonEvent()
 	ctx := context.Background()
-	_, err := s.calendar.Create(
+	_, err := s.calendar.CreateEvent(
 		ctx,
 		event.UserID,
 		event.Title,

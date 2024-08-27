@@ -5,10 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/app"
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/storage"
 )
 
 type UpdateEventTest struct {
@@ -29,7 +28,7 @@ func (s *UpdateEventTest) TestUpdateEvent() {
 		UserID:       event.UserID,
 		Notification: nil,
 	}
-	err = s.calendar.Update(ctx, id, updateEvent)
+	err = s.calendar.UpdateEvent(ctx, id, updateEvent)
 	s.Require().NoError(err)
 
 	data := s.GetAll()
@@ -48,7 +47,7 @@ func (s *UpdateEventTest) TestUpdateEventFailNotExistsEvent() {
 	event.Start = event.Start.Add(3 * time.Hour)
 	event.Start = event.Stop.Add(3 * time.Hour)
 	ctx := context.Background()
-	err = s.calendar.Update(ctx, id+1, event)
+	err = s.calendar.UpdateEvent(ctx, id+1, event)
 	s.Require().Equal(storage.ErrNotExistsEvent, err)
 }
 
@@ -59,7 +58,7 @@ func (s *UpdateEventTest) TestUpdateEventFailNoTitle() {
 
 	event.Title = ""
 	ctx := context.Background()
-	err = s.calendar.Update(ctx, id, event)
+	err = s.calendar.UpdateEvent(ctx, id, event)
 	s.Require().Equal(app.ErrEmptyTitle, err)
 }
 
@@ -70,7 +69,7 @@ func (s *UpdateEventTest) TestUpdateEventFailStartInPast() {
 
 	event.Start = time.Now().Add(-time.Minute)
 	ctx := context.Background()
-	err = s.calendar.Update(ctx, id, event)
+	err = s.calendar.UpdateEvent(ctx, id, event)
 	s.Require().Equal(app.ErrStartInPast, err)
 }
 
@@ -97,7 +96,7 @@ func (s *UpdateEventTest) TestUpdateEventNoDateBusy() {
 		updateEvent := s.NewCommonEvent()
 		updateEvent.Start = tt.start
 		updateEvent.Stop = tt.stop
-		err := s.calendar.Update(ctx, id, updateEvent)
+		err := s.calendar.UpdateEvent(ctx, id, updateEvent)
 		s.Require().NoError(err)
 	}
 }
@@ -128,7 +127,7 @@ func (s *UpdateEventTest) TestUpdateEventFailDateBusy() {
 		updateEvent := s.NewCommonEvent()
 		updateEvent.Start = tt.start
 		updateEvent.Stop = tt.stop
-		err := s.calendar.Update(ctx, id, updateEvent)
+		err := s.calendar.UpdateEvent(ctx, id, updateEvent)
 		s.Require().Equal(app.ErrDateBusy, err)
 	}
 }

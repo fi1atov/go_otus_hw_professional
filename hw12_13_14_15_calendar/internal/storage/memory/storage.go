@@ -69,6 +69,14 @@ func (s *store) DeleteEvent(_ context.Context, id int) error {
 	return nil
 }
 
+func (s *store) DeleteAllEvent(_ context.Context) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.data = make(data)
+	return nil
+}
+
 func (s *store) ListAllEvent(_ context.Context) ([]storage.Event, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

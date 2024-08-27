@@ -104,6 +104,17 @@ func (s *store) DeleteEvent(ctx context.Context, id int) error {
 	return nil
 }
 
+func (s *store) DeleteAllEvent(ctx context.Context) error {
+	query := `
+		TRUNCATE TABLE event RESTART IDENTITY
+	`
+	_, err := s.db.ExecContext(ctx, query)
+	if err != nil {
+		return fmt.Errorf("db exec: %w", err)
+	}
+	return nil
+}
+
 func (s *store) ListAllEvent(ctx context.Context) ([]storage.Event, error) {
 	query := `
 		SELECT event_id, title, start, stop, description, user_id, notification

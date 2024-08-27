@@ -23,6 +23,7 @@ type App interface {
 	) (id int, err error)
 	UpdateEvent(ctx context.Context, id int, change storage.Event) error
 	DeleteEvent(ctx context.Context, id int) error
+	DeleteAllEvent(ctx context.Context) error
 	ListAllEvent(ctx context.Context) ([]storage.Event, error)
 	ListDayEvent(ctx context.Context, date time.Time) ([]storage.Event, error)
 	ListWeekEvent(ctx context.Context, date time.Time) ([]storage.Event, error)

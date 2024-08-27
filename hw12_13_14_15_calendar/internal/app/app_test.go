@@ -1,17 +1,15 @@
 package app_test
 
 import (
-	"bytes"
 	"context"
 	"os"
 	"time"
 
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
 	"github.com/stretchr/testify/suite"
-
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/app"
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/logger"
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/storage"
-	"github.com/anfilat/otus-go/hw12_13_14_15_calendar/internal/storage/initstorage"
 )
 
 type SuiteTest struct {
@@ -21,28 +19,28 @@ type SuiteTest struct {
 	db       storage.Storage
 }
 
+// SetupTest выполняется перед каждым тестом.
 func (s *SuiteTest) SetupTest() {
 	ctx := context.Background()
 
-	var buf bytes.Buffer
-	s.logg, _ = logger.New("", &buf, "")
+	s.logg = logger.New("INFO", os.Stdout, "../../logs/log_test.log")
 
-	dbConnect := os.Getenv("PQ_TEST")
-	s.db, _ = initstorage.New(ctx, dbConnect == "", dbConnect)
+	dbConnect := "postgresql://postgres:postgres@localhost:6543/calendar"
+	s.db, _ = storecreator.New(ctx, true, dbConnect)
 
 	s.calendar = app.New(s.logg, s.db)
 
-	_ = s.calendar.DeleteAll(ctx)
+	_ = s.calendar.DeleteAllEvent(ctx)
 }
 
 func (s *SuiteTest) TearDownTest() {
 	ctx := context.Background()
-	_ = s.calendar.DeleteAll(ctx)
+	_ = s.calendar.DeleteAllEvent(ctx)
 	_ = s.db.Close(ctx)
 }
 
 func (s *SuiteTest) NewCommonEvent() storage.Event {
-	var eventStart = time.Now().Add(2 * time.Hour)
+	var eventStart = time.Now().Add(time.Hour * 2) //nolint:gofumpt
 	var eventStop = eventStart.Add(time.Hour)
 	notification := 4 * time.Hour
 
@@ -59,7 +57,7 @@ func (s *SuiteTest) NewCommonEvent() storage.Event {
 
 func (s *SuiteTest) AddEvent(event storage.Event) (int, error) {
 	ctx := context.Background()
-	id, err := s.calendar.Create(
+	id, err := s.calendar.CreateEvent(
 		ctx,
 		event.UserID,
 		event.Title,
@@ -73,7 +71,7 @@ func (s *SuiteTest) AddEvent(event storage.Event) (int, error) {
 
 func (s *SuiteTest) GetAll() []storage.Event {
 	ctx := context.Background()
-	data, err := s.calendar.ListAll(ctx)
+	data, err := s.calendar.ListAllEvent(ctx)
 	s.Require().NoError(err)
 	return data
 }
