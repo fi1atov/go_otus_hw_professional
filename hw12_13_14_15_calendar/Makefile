@@ -31,4 +31,15 @@ install-lint-deps:
 lint: install-lint-deps
 	golangci-lint run ./...
 
+install-goose:
+ifeq ($(wildcard $(GOOSE_BIN)),)
+	go get -u github.com/pressly/goose/cmd/goose
+	go build -i -o bin/goose github.com/pressly/goose/cmd/goose
+	go mod tidy
+GOOSE_BIN:=bin/goose
+endif
+
+migrate-up:
+	goose -dir migrations postgres "host=localhost port=6543 user=postgres password=postgres dbname=postgres sslmode=disable search_path=calendar" up
+
 .PHONY: build run build-img run-img version test lint
