@@ -62,6 +62,7 @@ func (s *ListEventTest) TestList() {
 	s.Require().NoError(err)
 
 	// за 1 день
+	time.Sleep(time.Second)
 	list, err := s.calendar.ListDayEvent(ctx, event1.Start)
 	time.Sleep(time.Second)
 	s.Require().NoError(err)
@@ -70,6 +71,7 @@ func (s *ListEventTest) TestList() {
 	s.EqualEvents(event2, list[1])
 
 	// за другой день
+	time.Sleep(time.Second)
 	list, err = s.calendar.ListDayEvent(ctx, event3.Start)
 	time.Sleep(time.Second)
 	s.Require().NoError(err)
@@ -77,6 +79,7 @@ func (s *ListEventTest) TestList() {
 	s.EqualEvents(event3, list[0])
 
 	// за неделю
+	time.Sleep(time.Second)
 	list, err = s.calendar.ListWeekEvent(ctx, event1.Start)
 	time.Sleep(time.Second)
 	s.Require().NoError(err)
@@ -86,6 +89,7 @@ func (s *ListEventTest) TestList() {
 	s.EqualEvents(event3, list[2])
 
 	// за месяц
+	time.Sleep(time.Second)
 	list, err = s.calendar.ListWeekEvent(ctx, event1.Start)
 	time.Sleep(time.Second)
 	s.Require().NoError(err)
@@ -95,6 +99,7 @@ func (s *ListEventTest) TestList() {
 	s.EqualEvents(event3, list[2])
 
 	// за другой месяц
+	time.Sleep(time.Second)
 	list, err = s.calendar.ListWeekEvent(ctx, event4.Start)
 	time.Sleep(time.Second)
 	s.Require().NoError(err)
