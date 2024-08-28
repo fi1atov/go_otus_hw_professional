@@ -39,7 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logg := logger.New(config.Logger.Level, os.Stdout, config.Logger.File)
+	logg := logger.New(config.Logger.Level, os.Stdout)
 
 	logg.Info("start calendar")
 

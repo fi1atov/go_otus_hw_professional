@@ -15,7 +15,6 @@ type Config struct {
 
 type LoggerConf struct {
 	Level string
-	File  string
 }
 
 type HTTPConf struct {

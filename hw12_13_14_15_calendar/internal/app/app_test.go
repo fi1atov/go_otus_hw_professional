@@ -23,7 +23,7 @@ type SuiteTest struct {
 func (s *SuiteTest) SetupTest() {
 	ctx := context.Background()
 
-	s.logg = logger.New("INFO", os.Stdout, "../../logs/log_test.log")
+	s.logg = logger.New("INFO", os.Stdout)
 
 	dbConnect := "postgresql://postgres:postgres@localhost:6543/calendar"
 	s.db, _ = storecreator.New(ctx, true, dbConnect)

@@ -1,6 +1,5 @@
 [logger]
 level = "INFO"
-file = "./logs/log.log"
 
 [server]
 host="127.0.0.1"
