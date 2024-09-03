@@ -3,21 +3,24 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
 )
+
+// go run cmd/calendar/*.go --config=configs/config.toml
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "", "Path to configuration file")
 }
 
 func main() {
@@ -28,13 +31,25 @@ func main() {
 		return
 	}
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	mainCtx, cancel := context.WithCancel(context.Background())
+	go watchSignals(cancel)
 
-	storage := memorystorage.New()
-	calendar := app.New(logg, storage)
+	config, err := NewConfig(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	server := internalhttp.NewServer(logg, calendar)
+	logg := logger.New(config.Logger.Level, os.Stdout)
+
+	logg.Info("start calendar")
+
+	db, err := storecreator.New(mainCtx, config.Database.Inmem, config.Database.Connect)
+	if err != nil {
+		logg.Error("err")
+	}
+	calendar := app.New(logg, db)
+
+	server := internalhttp.NewServer(calendar, logg)
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
@@ -53,9 +68,17 @@ func main() {
 
 	logg.Info("calendar is running...")
 
-	if err := server.Start(ctx); err != nil {
+	if err := server.Start(config.HTTP.Host + ":" + config.HTTP.Port); err != nil {
 		logg.Error("failed to start http server: " + err.Error())
 		cancel()
 		os.Exit(1) //nolint:gocritic
 	}
+}
+
+func watchSignals(cancel context.CancelFunc) {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	<-signals
+	cancel()
 }

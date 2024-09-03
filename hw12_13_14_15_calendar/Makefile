@@ -23,12 +23,23 @@ version: build
 	$(BIN) version
 
 test:
-	go test -race ./internal/... ./pkg/...
+	go test -v -count=1 -race -timeout=30s ./internal/...
 
 install-lint-deps:
-	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.50.1
+	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.56.2
 
 lint: install-lint-deps
 	golangci-lint run ./...
+
+install-goose:
+ifeq ($(wildcard $(GOOSE_BIN)),)
+	go get -u github.com/pressly/goose/cmd/goose
+	go build -i -o bin/goose github.com/pressly/goose/cmd/goose
+	go mod tidy
+GOOSE_BIN:=bin/goose
+endif
+
+migrate-up:
+	goose -dir migrations postgres "host=localhost port=6543 user=postgres password=postgres dbname=postgres sslmode=disable search_path=calendar" up
 
 .PHONY: build run build-img run-img version test lint

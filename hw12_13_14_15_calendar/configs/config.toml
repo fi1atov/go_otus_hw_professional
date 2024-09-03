@@ -1,5 +1,10 @@
 [logger]
 level = "INFO"
 
-# TODO
-# ...
+[server]
+host="127.0.0.1"
+port="8080"
+
+[database]
+inmemory=true
+connect="postgresql://postgres:postgres@localhost:6543/calendar"
