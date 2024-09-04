@@ -82,6 +82,17 @@ func (s *HTTPTest) TestUpdate() {
 	s.Require().Equal(http.StatusAccepted, res.StatusCode)
 }
 
+func (s *HTTPTest) TestDelete() {
+	event := s.NewCommonEvent()
+	id := s.AddEvent(event)
+
+	data, _ := json.Marshal(DeleteRequest{ID: id})
+
+	res, err := s.Delete("event/"+strconv.Itoa(id), data)
+	s.Require().NoError(err)
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+}
+
 func TestHttpCreateTest(t *testing.T) {
 	suite.Run(t, new(HTTPTest))
 }

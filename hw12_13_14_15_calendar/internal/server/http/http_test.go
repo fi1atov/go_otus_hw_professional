@@ -64,6 +64,18 @@ func (s *SuiteTest) Put(endPoint string, data []byte) (resp *http.Response, err 
 	return res, err
 }
 
+func (s *SuiteTest) Delete(endPoint string, data []byte) (resp *http.Response, err error) {
+	req, err := http.NewRequest(http.MethodDelete, s.ts.URL+"/"+endPoint, bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	return res, err
+}
+
 func (s *SuiteTest) NewCommonEvent() Event {
 	eventStart := time.Now().Add(time.Hour * 2)
 	eventStop := eventStart.Add(time.Hour)
