@@ -11,6 +11,7 @@ import (
 
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 )
 
 type server struct {
@@ -57,6 +58,7 @@ func (s *server) Stop(ctx context.Context) error {
 func (s *server) configureRouter() {
 	s.mux.HandleFunc("GET /hello", loggingMiddleware(s.handleHello, s.logger))
 	s.mux.HandleFunc("POST /create", loggingMiddleware(s.createEvent(s.app), s.logger))
+	s.mux.HandleFunc("PUT /update/{id}", loggingMiddleware(s.updateEvent(s.app), s.logger))
 }
 
 type M map[string]interface{}
@@ -83,4 +85,16 @@ func serverError(w http.ResponseWriter, err error) {
 
 func errorResponse(w http.ResponseWriter, code int, errs interface{}) {
 	writeJSON(w, code, M{"errors": errs})
+}
+
+func httpEventToStorageEvent(event Event) storage.Event {
+	return storage.Event{
+		ID:           event.ID,
+		Title:        event.Title,
+		Start:        event.Start,
+		Stop:         event.Stop,
+		Description:  event.Description,
+		UserID:       event.UserID,
+		Notification: event.Notification,
+	}
 }
