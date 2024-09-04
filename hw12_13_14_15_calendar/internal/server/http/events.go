@@ -86,3 +86,42 @@ func (s *server) deleteEvent(app app.App) http.HandlerFunc {
 		writeJSON(w, http.StatusOK, OkResult{Ok: true})
 	}
 }
+
+func (s *server) getListDay(app app.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		getList(w, r, app.ListDayEvent)
+	}
+}
+
+func (s *server) getListWeek(app app.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		getList(w, r, app.ListWeekEvent)
+	}
+}
+
+func (s *server) getListMonth(app app.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		getList(w, r, app.ListMonthEvent)
+	}
+}
+
+func getList(w http.ResponseWriter, r *http.Request, fn app.ListEvents) {
+	req := ListRequest{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	events, err := fn(r.Context(), req.Date)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result := make(ListResult, 0, len(events))
+	for _, event := range events {
+		result = append(result, storageEventToHTTPEvent(event))
+	}
+	writeJSON(w, http.StatusOK, result)
+}

@@ -40,6 +40,12 @@ type DeleteRequest struct {
 	ID int
 }
 
+type ListRequest struct {
+	Date time.Time
+}
+
+type ListResult []Event
+
 func (event Event) Validate() error {
 	if event.UserID < 1 {
 		return errors.New("user ID не может быть меньше 1")

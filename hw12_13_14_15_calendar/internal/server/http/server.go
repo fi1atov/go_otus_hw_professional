@@ -60,6 +60,9 @@ func (s *server) configureRouter() {
 	s.mux.HandleFunc("POST /event", loggingMiddleware(s.createEvent(s.app), s.logger))
 	s.mux.HandleFunc("PUT /event/{id}", loggingMiddleware(s.updateEvent(s.app), s.logger))
 	s.mux.HandleFunc("DELETE /event/{id}", loggingMiddleware(s.deleteEvent(s.app), s.logger))
+	s.mux.HandleFunc("POST /listday", loggingMiddleware(s.getListDay(s.app), s.logger))
+	s.mux.HandleFunc("POST /listweek", loggingMiddleware(s.getListWeek(s.app), s.logger))
+	s.mux.HandleFunc("POST /listmonth", loggingMiddleware(s.getListMonth(s.app), s.logger))
 }
 
 type M map[string]interface{}
@@ -90,6 +93,18 @@ func errorResponse(w http.ResponseWriter, code int, errs interface{}) {
 
 func httpEventToStorageEvent(event Event) storage.Event {
 	return storage.Event{
+		ID:           event.ID,
+		Title:        event.Title,
+		Start:        event.Start,
+		Stop:         event.Stop,
+		Description:  event.Description,
+		UserID:       event.UserID,
+		Notification: event.Notification,
+	}
+}
+
+func storageEventToHTTPEvent(event storage.Event) Event {
+	return Event{
 		ID:           event.ID,
 		Title:        event.Title,
 		Start:        event.Start,
