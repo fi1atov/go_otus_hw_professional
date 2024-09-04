@@ -4,16 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 )
 
-type HTTPCreateTest struct {
+type HTTPTest struct {
 	SuiteTest
 }
 
-func (s *HTTPCreateTest) TestCreate() {
+func (s *HTTPTest) TestCreate() {
 	tests := []struct {
 		name  string
 		event Event
@@ -35,7 +37,7 @@ func (s *HTTPCreateTest) TestCreate() {
 		s.T().Run(tt.name, func(_ *testing.T) {
 			data, _ := json.Marshal(tt.event)
 
-			res, err := s.Call("event", data)
+			res, err := s.Post("event", data)
 			s.Require().NoError(err)
 			defer res.Body.Close()
 
@@ -45,7 +47,7 @@ func (s *HTTPCreateTest) TestCreate() {
 
 			data, _ = json.Marshal(ListRequest{Date: tt.event.Start})
 
-			res, err = s.Call("listday", data)
+			res, err = s.Post("listday", data)
 			s.Require().NoError(err)
 			defer res.Body.Close()
 
@@ -59,14 +61,27 @@ func (s *HTTPCreateTest) TestCreate() {
 	}
 }
 
-func (s *HTTPCreateTest) TestCreateFail() {
-	res, err := s.Call("event", []byte("Hello, world\n"))
+func (s *HTTPTest) TestCreateFail() {
+	res, err := s.Post("event", []byte("Hello, world\n"))
 	s.Require().NoError(err)
 	defer res.Body.Close()
 
 	s.Require().Equal(http.StatusBadRequest, res.StatusCode)
 }
 
+func (s *HTTPTest) TestUpdate() {
+	event := s.NewCommonEvent()
+	id := s.AddEvent(event)
+
+	event.ID = id
+	event.Stop = event.Stop.Add(time.Hour)
+	data, _ := json.Marshal(event)
+
+	res, err := s.Put("event/"+strconv.Itoa(id), data)
+	s.Require().NoError(err)
+	s.Require().Equal(http.StatusAccepted, res.StatusCode)
+}
+
 func TestHttpCreateTest(t *testing.T) {
-	suite.Run(t, new(HTTPCreateTest))
+	suite.Run(t, new(HTTPTest))
 }

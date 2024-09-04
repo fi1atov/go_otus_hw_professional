@@ -47,8 +47,20 @@ func (s *SuiteTest) TearDownTest() {
 	_ = s.db.Close(ctx)
 }
 
-func (s *SuiteTest) Call(endPoint string, data []byte) (resp *http.Response, err error) {
+func (s *SuiteTest) Post(endPoint string, data []byte) (resp *http.Response, err error) {
 	res, err := http.Post(s.ts.URL+"/"+endPoint, "application/json", bytes.NewReader(data))
+	return res, err
+}
+
+func (s *SuiteTest) Put(endPoint string, data []byte) (resp *http.Response, err error) {
+	req, err := http.NewRequest(http.MethodPut, s.ts.URL+"/"+endPoint, bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
 	return res, err
 }
 
@@ -80,10 +92,10 @@ func (s *SuiteTest) EqualEvents(event1, event2 Event) {
 func (s *SuiteTest) AddEvent(event Event) int {
 	data, _ := json.Marshal(event)
 
-	res, err := http.Post(s.ts.URL+"/create", "application/json", bytes.NewReader(data))
+	res, err := http.Post(s.ts.URL+"/event", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
-	s.Require().Equal(http.StatusOK, res.StatusCode)
+	s.Require().Equal(http.StatusCreated, res.StatusCode)
 	return s.readCreateID(res.Body)
 }
 
