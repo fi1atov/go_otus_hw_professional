@@ -93,6 +93,48 @@ func (s *HTTPTest) TestDelete() {
 	s.Require().Equal(http.StatusOK, res.StatusCode)
 }
 
+func (s *HTTPTest) TestListDay() {
+	event := s.NewCommonEvent()
+	s.AddEvent(event)
+
+	data, _ := json.Marshal(ListRequest{Date: event.Start})
+
+	res, err := s.Post("listday", data)
+	s.Require().NoError(err)
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+	events := s.readEvents(res.Body)
+	s.Require().Equal(1, len(events))
+	s.EqualEvents(event, events[0])
+}
+
+func (s *HTTPTest) TestListWeek() {
+	event := s.NewCommonEvent()
+	s.AddEvent(event)
+
+	data, _ := json.Marshal(ListRequest{Date: event.Start})
+
+	res, err := s.Post("listweek", data)
+	s.Require().NoError(err)
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+	events := s.readEvents(res.Body)
+	s.Require().Equal(1, len(events))
+	s.EqualEvents(event, events[0])
+}
+
+func (s *HTTPTest) TestListMonth() {
+	event := s.NewCommonEvent()
+	s.AddEvent(event)
+
+	data, _ := json.Marshal(ListRequest{Date: event.Start})
+
+	res, err := s.Post("listmonth", data)
+	s.Require().NoError(err)
+	s.Require().Equal(http.StatusOK, res.StatusCode)
+	events := s.readEvents(res.Body)
+	s.Require().Equal(1, len(events))
+	s.EqualEvents(event, events[0])
+}
+
 func TestHttpCreateTest(t *testing.T) {
 	suite.Run(t, new(HTTPTest))
 }
