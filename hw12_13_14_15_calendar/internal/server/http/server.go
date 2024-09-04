@@ -2,8 +2,10 @@ package internalhttp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -54,4 +56,31 @@ func (s *server) Stop(ctx context.Context) error {
 
 func (s *server) configureRouter() {
 	s.mux.HandleFunc("GET /hello", loggingMiddleware(s.handleHello, s.logger))
+	s.mux.HandleFunc("POST /create", loggingMiddleware(s.createEvent(s.app), s.logger))
+}
+
+type M map[string]interface{}
+
+func writeJSON(w http.ResponseWriter, code int, data interface{}) {
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		serverError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	_, err = w.Write(jsonBytes)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func serverError(w http.ResponseWriter, err error) {
+	log.Println(err)
+	errorResponse(w, http.StatusInternalServerError, "internal error")
+}
+
+func errorResponse(w http.ResponseWriter, code int, errs interface{}) {
+	writeJSON(w, code, M{"errors": errs})
 }

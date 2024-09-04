@@ -23,8 +23,8 @@ type HTTPConf struct {
 }
 
 type DatabaseConf struct {
-	Inmem   bool
-	Connect string
+	Inmemory bool
+	Connect  string
 }
 
 func NewConfig(configFile string) (Config, error) {

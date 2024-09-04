@@ -43,7 +43,7 @@ func main() {
 
 	logg.Info("start calendar")
 
-	db, err := storecreator.New(mainCtx, config.Database.Inmem, config.Database.Connect)
+	db, err := storecreator.New(mainCtx, config.Database.Inmemory, config.Database.Connect)
 	if err != nil {
 		logg.Error("err")
 	}
