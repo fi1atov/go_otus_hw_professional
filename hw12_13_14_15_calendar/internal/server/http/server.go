@@ -57,8 +57,9 @@ func (s *server) Stop(ctx context.Context) error {
 
 func (s *server) configureRouter() {
 	s.mux.HandleFunc("GET /hello", loggingMiddleware(s.handleHello, s.logger))
-	s.mux.HandleFunc("POST /create", loggingMiddleware(s.createEvent(s.app), s.logger))
-	s.mux.HandleFunc("PUT /update/{id}", loggingMiddleware(s.updateEvent(s.app), s.logger))
+	s.mux.HandleFunc("POST /event", loggingMiddleware(s.createEvent(s.app), s.logger))
+	s.mux.HandleFunc("PUT /event/{id}", loggingMiddleware(s.updateEvent(s.app), s.logger))
+	s.mux.HandleFunc("DELETE /event/{id}", loggingMiddleware(s.deleteEvent(s.app), s.logger))
 }
 
 type M map[string]interface{}

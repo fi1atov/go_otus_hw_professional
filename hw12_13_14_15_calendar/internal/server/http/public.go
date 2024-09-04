@@ -36,6 +36,10 @@ type OkResult struct {
 	Ok bool
 }
 
+type DeleteRequest struct {
+	ID int
+}
+
 func (event Event) Validate() error {
 	if event.UserID < 1 {
 		return errors.New("user ID не может быть меньше 1")

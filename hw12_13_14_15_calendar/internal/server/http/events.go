@@ -69,3 +69,20 @@ func (s *server) updateEvent(app app.App) http.HandlerFunc {
 		writeJSON(w, http.StatusAccepted, OkResult{Ok: true})
 	}
 }
+
+func (s *server) deleteEvent(app app.App) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Получаем ID события из URL и конвертируем в int
+		eventID, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Удаление события
+		err = app.DeleteEvent(r.Context(), eventID)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		writeJSON(w, http.StatusOK, OkResult{Ok: true})
+	}
+}
