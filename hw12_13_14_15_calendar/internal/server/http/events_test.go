@@ -77,7 +77,7 @@ func (s *HTTPTest) TestUpdate() {
 	event.Stop = event.Stop.Add(time.Hour)
 	data, _ := json.Marshal(event)
 
-	res, err := s.Put("event/"+strconv.Itoa(id), data)
+	res, err := s.Put("event/"+strconv.Itoa(id), data) //nolint:bodyclose
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusAccepted, res.StatusCode)
 }
@@ -88,7 +88,7 @@ func (s *HTTPTest) TestDelete() {
 
 	data, _ := json.Marshal(DeleteRequest{ID: id})
 
-	res, err := s.Delete("event/"+strconv.Itoa(id), data)
+	res, err := s.Delete("event/"+strconv.Itoa(id), data) //nolint:bodyclose
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, res.StatusCode)
 }
@@ -99,7 +99,7 @@ func (s *HTTPTest) TestListDay() {
 
 	data, _ := json.Marshal(ListRequest{Date: event.Start})
 
-	res, err := s.Post("listday", data)
+	res, err := s.Post("listday", data) //nolint:bodyclose
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, res.StatusCode)
 	events := s.readEvents(res.Body)
@@ -113,7 +113,7 @@ func (s *HTTPTest) TestListWeek() {
 
 	data, _ := json.Marshal(ListRequest{Date: event.Start})
 
-	res, err := s.Post("listweek", data)
+	res, err := s.Post("listweek", data) //nolint:bodyclose
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, res.StatusCode)
 	events := s.readEvents(res.Body)
@@ -127,7 +127,7 @@ func (s *HTTPTest) TestListMonth() {
 
 	data, _ := json.Marshal(ListRequest{Date: event.Start})
 
-	res, err := s.Post("listmonth", data)
+	res, err := s.Post("listmonth", data) //nolint:bodyclose
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusOK, res.StatusCode)
 	events := s.readEvents(res.Body)

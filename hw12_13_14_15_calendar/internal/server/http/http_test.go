@@ -48,7 +48,7 @@ func (s *SuiteTest) TearDownTest() {
 }
 
 func (s *SuiteTest) Post(endPoint string, data []byte) (resp *http.Response, err error) {
-	res, err := http.Post(s.ts.URL+"/"+endPoint, "application/json", bytes.NewReader(data))
+	res, err := http.Post(s.ts.URL+"/"+endPoint, "application/json", bytes.NewReader(data)) //nolint:noctx
 	return res, err
 }
 
@@ -65,7 +65,7 @@ func (s *SuiteTest) Put(endPoint string, data []byte) (resp *http.Response, err 
 }
 
 func (s *SuiteTest) Delete(endPoint string, data []byte) (resp *http.Response, err error) {
-	req, err := http.NewRequest(http.MethodDelete, s.ts.URL+"/"+endPoint, bytes.NewReader(data))
+	req, err := http.NewRequest(http.MethodDelete, s.ts.URL+"/"+endPoint, bytes.NewReader(data)) //nolint:noctx
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (s *SuiteTest) EqualEvents(event1, event2 Event) {
 func (s *SuiteTest) AddEvent(event Event) int {
 	data, _ := json.Marshal(event)
 
-	res, err := http.Post(s.ts.URL+"/event", "application/json", bytes.NewReader(data))
+	res, err := http.Post(s.ts.URL+"/event", "application/json", bytes.NewReader(data)) //nolint:noctx,bodyclose
 
 	s.Require().NoError(err)
 	s.Require().Equal(http.StatusCreated, res.StatusCode)
