@@ -42,4 +42,7 @@ endif
 migrate-up:
 	goose -dir migrations postgres "host=localhost port=6543 user=postgres password=postgres dbname=postgres sslmode=disable search_path=calendar" up
 
-.PHONY: build run build-img run-img version test lint
+generate:
+	protoc --proto_path=api/ --go_out=internal/server/grpc --go-grpc_out=internal/server/grpc api/EventService.proto
+
+.PHONY: build run build-img run-img version test lint generate

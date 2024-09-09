@@ -39,7 +39,7 @@ func (s *server) Start(addr string) error {
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
 	}
-	s.logger.Info("starting http server")
+	s.logger.Info("starting http server on ", addr)
 	err := s.srv.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {
 		return nil
