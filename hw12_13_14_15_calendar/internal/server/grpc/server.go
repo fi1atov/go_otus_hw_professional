@@ -24,6 +24,8 @@ func newServer(app app.App, logger logger.Logger) *server {
 	return s
 }
 
+// Start protoc --proto_path=api/ --go_out=internal/server/grpc
+// --go-grpc_out=internal/server/grpc api/EventService.proto.
 func (s *server) Start(addr string) error {
 	lsn, err := net.Listen("tcp", addr)
 	if err != nil {
@@ -34,7 +36,7 @@ func (s *server) Start(addr string) error {
 	RegisterCalendarServer(s.srv, NewService(s.app))
 	reflection.Register(s.srv)
 
-	s.logger.Info("starting grpc server on ", addr)
+	s.logger.Info("starting grpc server on " + addr)
 	return s.srv.Serve(lsn)
 }
 
