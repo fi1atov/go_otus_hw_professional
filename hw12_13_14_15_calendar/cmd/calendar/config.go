@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Logger   LoggerConf
-	HTTP     HTTPConf
+	Server   ServerConf
 	Database DatabaseConf
 }
 
@@ -17,14 +17,15 @@ type LoggerConf struct {
 	Level string
 }
 
-type HTTPConf struct {
-	Host string
-	Port string
+type ServerConf struct {
+	Host     string
+	HTTPPort string
+	GRPCPort string
 }
 
 type DatabaseConf struct {
-	Inmem   bool
-	Connect string
+	Inmemory bool
+	Connect  string
 }
 
 func NewConfig(configFile string) (Config, error) {
@@ -38,8 +39,9 @@ func NewConfig(configFile string) (Config, error) {
 
 	v.SetDefault("logger.level", "INFO")
 
-	v.SetDefault("http.host", "127.0.0.1")
-	v.SetDefault("http.port", "8080")
+	v.SetDefault("server.host", "127.0.0.1")
+	v.SetDefault("server.httpPort", "8080")
+	v.SetDefault("server.grpcPort", "8081")
 
 	v.SetDefault("database.inmemory", true)
 

@@ -6,12 +6,15 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	grpcserver "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/grpc"
 	internalhttp "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
 )
 
@@ -43,36 +46,38 @@ func main() {
 
 	logg.Info("start calendar")
 
-	db, err := storecreator.New(mainCtx, config.Database.Inmem, config.Database.Connect)
+	db, err := storecreator.New(mainCtx, config.Database.Inmemory, config.Database.Connect)
 	if err != nil {
 		logg.Error("err")
 	}
 	calendar := app.New(logg, db)
 
-	server := internalhttp.NewServer(calendar, logg)
-
-	ctx, cancel := signal.NotifyContext(context.Background(),
-		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	defer cancel()
-
+	httpServer := internalhttp.NewServer(calendar, logg)
 	go func() {
-		<-ctx.Done()
+		err := httpServer.Start(config.Server.Host + ":" + config.Server.HTTPPort)
+		if err != nil {
+			logg.Error("Error: ", err)
+			cancel()
+		}
+	}()
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-		defer cancel()
-
-		if err := server.Stop(ctx); err != nil {
-			logg.Error("failed to stop http server: " + err.Error())
+	grpcServer := grpcserver.NewServer(calendar, logg)
+	go func() {
+		err := grpcServer.Start(config.Server.Host + ":" + config.Server.GRPCPort)
+		if err != nil {
+			logg.Error("Error: ", err)
+			cancel()
 		}
 	}()
 
 	logg.Info("calendar is running...")
 
-	if err := server.Start(config.HTTP.Host + ":" + config.HTTP.Port); err != nil {
-		logg.Error("failed to start http server: " + err.Error())
-		cancel()
-		os.Exit(1) //nolint:gocritic
-	}
+	<-mainCtx.Done()
+
+	logg.Info("stopping calendar...")
+	cancel()
+	shutDown(logg, httpServer, grpcServer, db)
+	logg.Info("calendar is stopped")
 }
 
 func watchSignals(cancel context.CancelFunc) {
@@ -81,4 +86,33 @@ func watchSignals(cancel context.CancelFunc) {
 
 	<-signals
 	cancel()
+}
+
+func shutDown(logg logger.Logger, httpServer internalhttp.Server, grpcServer grpcserver.Server, db storage.Storage) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+
+	wg := &sync.WaitGroup{}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := httpServer.Stop(ctx); err != nil {
+			logg.Error("Error: ", err)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := grpcServer.Stop(ctx); err != nil {
+			logg.Error("Error: ", err)
+		}
+	}()
+
+	wg.Wait()
+
+	if err := db.Close(ctx); err != nil {
+		logg.Error("Error: ", err)
+	}
 }
