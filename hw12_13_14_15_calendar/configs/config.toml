@@ -7,5 +7,5 @@ httpPort="8080"
 grpcPort="8081"
 
 [database]
-inmemory=true
-connect="postgresql://postgres:postgres@localhost:6543/calendar"
+inmemory=false
+connect="postgresql://postgres:postgres@localhost:6543/postgres?search_path=calendar"

@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	// обязательно проинициализировать db driver.
+	_ "github.com/jackc/pgx/v4/stdlib"
+
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 )
 
