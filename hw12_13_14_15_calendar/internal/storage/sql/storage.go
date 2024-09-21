@@ -159,6 +159,15 @@ func (s *store) ListMonthEvent(ctx context.Context, date time.Time) ([]storage.E
 	return s.queryList(ctx, query, year, month)
 }
 
+func (s *store) GetEventsReminder(ctx context.Context) ([]storage.Event, error) {
+	query := `
+		SELECT event_id, title, start, stop, description, user_id, notification
+		FROM event
+		WHERE notification IS NULL
+	`
+	return s.queryList(ctx, query)
+}
+
 func (s *store) queryList(
 	ctx context.Context,
 	query string,

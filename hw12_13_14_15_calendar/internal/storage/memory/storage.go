@@ -133,6 +133,17 @@ func (s *store) ListMonthEvent(_ context.Context, date time.Time) ([]storage.Eve
 	return result, nil
 }
 
+func (s *store) GetEventsReminder(_ context.Context) ([]storage.Event, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	result := make([]storage.Event, 0, len(s.data))
+	for _, event := range s.data {
+		result = append(result, event)
+	}
+	return result, nil
+}
+
 func (s *store) IsTimeBusyEvent(_ context.Context, userID int, start, stop time.Time, excludeID int) (bool, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

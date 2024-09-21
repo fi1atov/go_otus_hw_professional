@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/app"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
-	internalrmqproducer "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/mq/producer/rmq"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/scheduler"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	internalrmqproducer "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/mq/producer/rmq"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/scheduler"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage/storecreator"
+	"github.com/spf13/cobra"
 )
 
 var cfgFile string
@@ -30,12 +31,8 @@ var rootCmd = &cobra.Command{
 			log.Println("Error create app logger: " + err.Error())
 			return
 		}
-		storage := app.GetEventUseCase(config.Database)
-		err = storage.Connect(ctx)
-		if err != nil {
-			logg.Error("Error create db connection: " + err.Error())
-			return
-		}
+		storage, _ := storecreator.New(ctx, config.Database.Inmemory, config.Database.Connect)
+
 		produce := internalrmqproducer.New(config.Producer, logg)
 		appl := scheduler.New(logg, produce, storage, config.Duration)
 		if err = produce.Connect(ctx); err != nil {
@@ -54,7 +51,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./configs/scheduler_config.toml", "Configuration file path")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "./configs/config_scheduler.toml", "Configuration file path")
 }
 
 func main() {

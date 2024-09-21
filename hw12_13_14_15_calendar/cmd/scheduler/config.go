@@ -1,16 +1,19 @@
 package main
 
 import (
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/config"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
-	internalrmqproducer "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/mq/producer/rmq"
-	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"time"
+
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/config"
+	internalrmqproducer "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/mq/producer/rmq"
 )
 
+type DatabaseConf struct {
+	Inmemory bool
+	Connect  string
+}
+
 type Config struct {
-	Logger   *logger.Config              `mapstructure:"logger"`
-	Database *storage.Config             `mapstructure:"database"`
+	Database DatabaseConf                `mapstructure:"database"`
 	Producer *internalrmqproducer.Config `mapstructure:"rmq"`
 	Duration time.Duration               `mapstructure:"duration"`
 }
