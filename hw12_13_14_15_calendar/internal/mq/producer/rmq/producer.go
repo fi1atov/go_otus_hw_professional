@@ -44,7 +44,7 @@ func New(conf *Config, logger logger.Logger) *Producer {
 	}
 }
 
-func (p *Producer) Connect(ctx context.Context) error {
+func (p *Producer) Connect(_ context.Context) error {
 	p.logger.Info("connect to rmq")
 	err := p.mq.Connect(p.Addr)
 	if err != nil {
@@ -70,7 +70,7 @@ func (p *Producer) declare() error {
 	return err
 }
 
-func (p *Producer) Close(ctx context.Context) error {
+func (p *Producer) Close(_ context.Context) error {
 	err := p.mq.Close()
 	if err != nil {
 		return err

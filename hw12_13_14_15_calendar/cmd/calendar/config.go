@@ -1,61 +1,53 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/logger"
+	internalgrpc "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/grpc"
+	internalhttp "github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Logger   LoggerConf
-	Server   ServerConf
-	Database DatabaseConf
+	Logger *logger.Config `mapstructure:"logger"`
+	App    *AppConf       `mapstructure:"app"`
 }
 
-type LoggerConf struct {
-	Level string
-}
-
-type ServerConf struct {
-	Host     string
-	HTTPPort string
-	GRPCPort string
-}
-
-type DatabaseConf struct {
-	Inmemory bool
-	Connect  string
+type AppConf struct {
+	GRPCServer *internalgrpc.Config `mapstructure:"grpc_server"`
+	HTTPServer *internalhttp.Config `mapstructure:"http_server"`
+	Database   *storage.Config      `mapstructure:"database"`
 }
 
 func NewConfig(configFile string) (Config, error) {
-	config := Config{}
+	conf := Config{}
+	_, err := ReadConfigFile(configFile, "toml", &conf)
+	return conf, err
+}
 
-	// viper спсобен прочитать конфиг-файл
-	v := viper.New()
-	// нужно для настройки viper - чтобы все нашел
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
-	v.AutomaticEnv()
+func ReadConfigFile(pathToFile, typeFile string, configuration interface{}) (interface{}, error) {
+	viper.SetConfigFile(pathToFile)
+	viper.SetConfigType(typeFile)
+	viper.AutomaticEnv()
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
 
-	v.SetDefault("logger.level", "INFO")
+	viper.SetDefault("logger.level", "INFO")
 
-	v.SetDefault("server.host", "127.0.0.1")
-	v.SetDefault("server.httpPort", "8080")
-	v.SetDefault("server.grpcPort", "8081")
+	viper.SetDefault("server.host", "127.0.0.1")
+	viper.SetDefault("server.httpPort", "8080")
+	viper.SetDefault("server.grpcPort", "8081")
 
-	v.SetDefault("database.inmemory", true)
+	viper.SetDefault("database.inmemory", true)
 
-	if configFile != "" {
-		v.SetConfigFile(configFile)
-		err := v.ReadInConfig()
-		if err != nil {
-			return config, fmt.Errorf("failed to read configuration: %w", err)
-		}
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+	if err := viper.Unmarshal(&configuration); err != nil {
+		return nil, err
 	}
 
-	if err := v.Unmarshal(&config); err != nil {
-		return config, fmt.Errorf("failed to unmarshal configuration: %w", err)
-	}
-
-	return config, nil
+	return configuration, nil
 }

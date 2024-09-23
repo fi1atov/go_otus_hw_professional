@@ -16,7 +16,7 @@ type store struct {
 	data   data
 }
 
-func (s *store) Connect(_ context.Context, _ string) error {
+func (s *store) Connect(_ context.Context) error {
 	return nil
 }
 

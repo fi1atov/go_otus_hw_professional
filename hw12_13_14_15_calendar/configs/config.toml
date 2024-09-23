@@ -1,11 +1,21 @@
 [logger]
 level = "INFO"
 
-[server]
-host="127.0.0.1"
-httpPort="8080"
-grpcPort="8081"
+[app.http_server]
+host = "127.0.0.1"
+port = "8080"
 
-[database]
+[app.grpc_server]
+host = "127.0.0.1"
+port = "8081"
+
+[app.database]
 inmemory=false
-connect="postgresql://postgres:postgres@localhost:6543/postgres?search_path=calendar"
+driver = "postgres"
+host = "localhost"
+port = "6543"
+db = "postgres"
+user = "postgres"
+password = "postgres"
+ssl = "disable"
+schema = "calendar"

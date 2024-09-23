@@ -30,8 +30,18 @@ func (s *SuiteTest) SetupTest() {
 
 	s.logg = logger.New("INFO", os.Stdout)
 
-	dbConnect := os.Getenv("TEST")
-	s.db, _ = storecreator.New(ctx, dbConnect == "", dbConnect)
+	config := storage.Config{
+		Host:     "localhost",
+		Port:     "8080",
+		Inmemory: true,
+		Driver:   "postgres",
+		Ssl:      "disable",
+		Database: "postgres",
+		User:     "postgres",
+		Password: "postgres",
+		Schema:   "calendar",
+	}
+	s.db, _ = storecreator.New(ctx, &config)
 
 	s.app = app.New(s.logg, s.db)
 

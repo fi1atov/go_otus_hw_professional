@@ -18,7 +18,7 @@ var cfgFile string
 
 var rootCmd = &cobra.Command{
 	Short: "Sender application",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 		defer cancel()
 		config, err := NewConfig(cfgFile)

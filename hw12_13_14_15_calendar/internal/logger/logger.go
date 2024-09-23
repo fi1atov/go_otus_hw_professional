@@ -4,6 +4,10 @@ import (
 	"log/slog"
 )
 
+type Config struct {
+	Level string `mapstructure:"level"`
+}
+
 type logger struct {
 	logger *slog.Logger
 }

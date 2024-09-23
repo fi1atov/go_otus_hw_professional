@@ -25,8 +25,18 @@ func (s *SuiteTest) SetupTest() {
 
 	s.logg = logger.New("INFO", os.Stdout)
 
-	dbConnect := "postgresql://postgres:postgres@localhost:6543/calendar"
-	s.db, _ = storecreator.New(ctx, true, dbConnect)
+	config := storage.Config{
+		Host:     "localhost",
+		Port:     "8080",
+		Inmemory: true,
+		Driver:   "postgres",
+		Ssl:      "disable",
+		Database: "postgres",
+		User:     "postgres",
+		Password: "postgres",
+		Schema:   "calendar",
+	}
+	s.db, _ = storecreator.New(ctx, &config)
 
 	s.calendar = app.New(s.logg, s.db)
 

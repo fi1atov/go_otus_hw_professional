@@ -12,11 +12,12 @@ import (
 )
 
 type store struct {
-	db *sql.DB
+	dataSourceName string
+	db             *sql.DB
 }
 
-func (s *store) Connect(ctx context.Context, connect string) error {
-	db, err := sql.Open("pgx", connect)
+func (s *store) Connect(ctx context.Context) error {
+	db, err := sql.Open("pgx", s.dataSourceName)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}

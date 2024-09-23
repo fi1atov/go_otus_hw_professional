@@ -14,6 +14,11 @@ import (
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
 )
 
+type Config struct {
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
+}
+
 type server struct {
 	app    app.App
 	logger logger.Logger

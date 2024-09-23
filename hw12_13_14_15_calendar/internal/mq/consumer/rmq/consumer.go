@@ -50,7 +50,7 @@ func New(conf *Config, logger logger.Logger) *Consumer {
 	}
 }
 
-func (c *Consumer) Connect(ctx context.Context) error {
+func (c *Consumer) Connect(_ context.Context) error {
 	c.logger.Info("connect to rmq")
 	err := c.mq.Connect(c.Addr)
 	if err != nil {
@@ -96,7 +96,7 @@ func (c *Consumer) Connect(ctx context.Context) error {
 	return err
 }
 
-func (c *Consumer) Close(ctx context.Context) error {
+func (c *Consumer) Close(_ context.Context) error {
 	err := c.StatusChan.Close()
 	if err != nil {
 		return err
@@ -136,7 +136,7 @@ func (c *Consumer) Consume(ctx context.Context, f func(ctx context.Context, msg 
 	}
 }
 
-func (c *Consumer) PublishStatus(ctx context.Context, data []byte) error {
+func (c *Consumer) PublishStatus(_ context.Context, data []byte) error {
 	return c.StatusChan.Publish(
 		c.ExchangeName,
 		c.StatusQueueName,

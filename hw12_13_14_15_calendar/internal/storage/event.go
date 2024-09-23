@@ -12,7 +12,7 @@ type Storage interface {
 }
 
 type Base interface {
-	Connect(ctx context.Context, connect string) error
+	Connect(ctx context.Context) error
 	Close(ctx context.Context) error
 }
 

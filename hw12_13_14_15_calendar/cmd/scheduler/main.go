@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -18,7 +19,7 @@ var cfgFile string
 
 var rootCmd = &cobra.Command{
 	Short: "Scheduler application",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 		defer cancel()
 		config, err := NewConfig(cfgFile)
@@ -31,7 +32,10 @@ var rootCmd = &cobra.Command{
 			log.Println("Error create app logger: " + err.Error())
 			return
 		}
-		storage, _ := storecreator.New(ctx, config.Database.Inmemory, config.Database.Connect)
+		storage, err := storecreator.New(ctx, config.Database)
+		if err != nil {
+			fmt.Println(err)
+		}
 
 		produce := internalrmqproducer.New(config.Producer, logg)
 		appl := scheduler.New(logg, produce, storage, config.Duration)
