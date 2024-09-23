@@ -43,19 +43,8 @@ run-sender: build-sender ## Run sender app
 version: build  ## Project version
 	$(BIN_CALENDAR) version
 
-test: ## Execute tests
-	go test -race ./internal/... ./api/...
-
 wait-for-db:
 	sleep 5
-
-integration: postgres-up wait-for-db migrate ## Execute integration tests
-	go test --tags=$@ -race ./internal/... ./api/...
-
-
-coverage: postgres-up wait-for-db migrate ## test coverage
-	go test --tags=integration -coverprofile=coverage.out ./internal/...
-	go tool cover -html coverage.out
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.51.1
@@ -83,14 +72,6 @@ downgrade: ## Downgrade db items
 migration_status: ## Current migrations status
 	$(__GOOSE_CMD) status
 
-.PHONY: build run version test lint help coverage goose
+.PHONY: build run version lint help coverage goose
 
 include make/docker.mk
-
-__integration-t:
-	sleep 3 && ginkgo --repeat=10 -p -v ./pkg/tests -- --scheduler-duration="$(DURATION)"
-
-integration-tests: DURATION=5s
-
-integration-tests: down up __integration-t ## Execute smoke-tests
-	$(MAKE) down

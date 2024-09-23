@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB:  ${DB_DATABASE}
     ports:
-      - "5532:5432"
+      - "6543:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
@@ -41,7 +41,7 @@ services:
   migrator:
     environment:
       GOOSE_DRIVER: postgres
-      GOOSE_DBSTRING: "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_DATABASE}?sslmode=disable&search_path={DB_SCHEMA}" 
+      GOOSE_DBSTRING: "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:6543/${DB_DATABASE}?sslmode=disable&search_path={DB_SCHEMA}" 
     depends_on:
         calendar_postgres:
           condition: service_healthy

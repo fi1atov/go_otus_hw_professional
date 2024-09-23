@@ -55,7 +55,7 @@ services:
     networks:
       calendar:
 
-#===============SENDER==============#
+#==============SCHEDULER============#
 
   scheduler:
     image: ${DOCKER_REGISTRY}calendar_scheduler
