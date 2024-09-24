@@ -144,7 +144,7 @@ func (s *store) GetEventsReminder(_ context.Context) ([]storage.Event, error) {
 	return result, nil
 }
 
-func (s *store) DeleteEventsBeforeDate(ctx context.Context, date time.Time) error {
+func (s *store) DeleteEventsBeforeDate(_ context.Context, date time.Time) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	for id, event := range s.data {
