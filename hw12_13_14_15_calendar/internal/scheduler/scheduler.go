@@ -33,6 +33,11 @@ func (a *App) Publish(ctx context.Context, data []byte) error {
 	return a.p.Publish(ctx, data)
 }
 
+func (a *App) DeleteOldEvents(ctx context.Context) error {
+	a.logger.Info("deleting old events...")
+	return a.storage.DeleteEventsBeforeDate(ctx, time.Now().AddDate(-1, 0, 0))
+}
+
 func (a *App) PublishEvents(ctx context.Context) {
 	events, err := a.storage.GetEventsReminder(ctx)
 	if err != nil {
@@ -65,6 +70,10 @@ func (a *App) Run(ctx context.Context) error {
 	defer a.logger.Info("Stopping scheduler")
 	for {
 		go func() {
+			err := a.DeleteOldEvents(ctx)
+			if err != nil {
+				a.logger.Error(fmt.Sprintf("fail delete old events %s", err))
+			}
 			a.PublishEvents(ctx)
 			a.logger.Info(fmt.Sprintf("Next operation start after %s", a.duration))
 		}()

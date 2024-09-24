@@ -27,6 +27,7 @@ type Events interface {
 	ListMonthEvent(ctx context.Context, date time.Time) ([]Event, error)
 	IsTimeBusyEvent(ctx context.Context, userID int, start, stop time.Time, excludeID int) (bool, error)
 	GetEventsReminder(ctx context.Context) ([]Event, error)
+	DeleteEventsBeforeDate(ctx context.Context, date time.Time) error
 }
 
 type Event struct {

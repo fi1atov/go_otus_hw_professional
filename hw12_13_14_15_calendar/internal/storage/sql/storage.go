@@ -169,6 +169,12 @@ func (s *store) GetEventsReminder(ctx context.Context) ([]storage.Event, error) 
 	return s.queryList(ctx, query)
 }
 
+func (s *store) DeleteEventsBeforeDate(ctx context.Context, date time.Time) error {
+	statement := `DELETE FROM event WHERE stop <= $1`
+	_, err := s.db.ExecContext(ctx, statement, date)
+	return err
+}
+
 func (s *store) queryList(
 	ctx context.Context,
 	query string,
