@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -31,7 +30,6 @@ var rootCmd = &cobra.Command{
 			log.Println("Error create app logger: " + err.Error())
 			return
 		}
-		fmt.Println("OKOKOKO")
 		consumer := internalrmqconsumer.New(config.Consumer, logg)
 		app := sender.New(logg, consumer)
 		if err := consumer.Connect(ctx); err != nil {
