@@ -43,6 +43,9 @@ run-sender: build-sender ## Run sender app
 version: build  ## Project version
 	$(BIN_CALENDAR) version
 
+test: ## Execute tests
+	go test -race ./...
+
 wait-for-db:
 	sleep 5
 
@@ -72,6 +75,6 @@ downgrade: ## Downgrade db items
 migration_status: ## Current migrations status
 	$(__GOOSE_CMD) status
 
-.PHONY: build run version lint help coverage goose
+.PHONY: build run version test lint help coverage goose
 
 include make/docker.mk
