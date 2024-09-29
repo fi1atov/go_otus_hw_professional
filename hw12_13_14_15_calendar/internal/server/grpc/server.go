@@ -10,6 +10,11 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+type Config struct {
+	Host string `mapstructure:"host"`
+	Port string `mapstructure:"port"`
+}
+
 type server struct {
 	app    app.App
 	logger logger.Logger

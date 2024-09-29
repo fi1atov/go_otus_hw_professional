@@ -46,7 +46,7 @@ func main() {
 
 	logg.Info("start calendar")
 
-	db, err := storecreator.New(mainCtx, config.Database.Inmemory, config.Database.Connect)
+	db, err := storecreator.New(mainCtx, config.App.Database)
 	if err != nil {
 		logg.Error("err")
 	}
@@ -54,7 +54,7 @@ func main() {
 
 	httpServer := internalhttp.NewServer(calendar, logg)
 	go func() {
-		err := httpServer.Start(config.Server.Host + ":" + config.Server.HTTPPort)
+		err := httpServer.Start(config.App.HTTPServer.Host + ":" + config.App.HTTPServer.Port)
 		if err != nil {
 			logg.Error("Error: ", err)
 			cancel()
@@ -63,7 +63,7 @@ func main() {
 
 	grpcServer := grpcserver.NewServer(calendar, logg)
 	go func() {
-		err := grpcServer.Start(config.Server.Host + ":" + config.Server.GRPCPort)
+		err := grpcServer.Start(config.App.GRPCServer.Host + ":" + config.App.GRPCServer.Port)
 		if err != nil {
 			logg.Error("Error: ", err)
 			cancel()

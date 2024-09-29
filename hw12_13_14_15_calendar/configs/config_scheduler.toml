@@ -1,0 +1,26 @@
+duration = "120s"
+
+[logger]
+level = "DEBUG"
+out_paths = ["stdout"]
+err_paths = ["stderr"]
+
+[database]
+inmemory=false
+driver = "postgres"
+host = "localhost"
+port = "6543"
+db = "postgres"
+user = "postgres"
+password = "postgres"
+ssl = "disable"
+schema = "calendar"
+
+[rmq]
+host = "localhost"
+port = "5672"
+protocol = "amqp"
+username = "guest"
+password = "guest"
+exchange = "test-exchange"
+queue = "test-queue"

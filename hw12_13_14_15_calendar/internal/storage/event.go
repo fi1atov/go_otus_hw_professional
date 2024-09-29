@@ -12,7 +12,7 @@ type Storage interface {
 }
 
 type Base interface {
-	Connect(ctx context.Context, connect string) error
+	Connect(ctx context.Context) error
 	Close(ctx context.Context) error
 }
 
@@ -26,6 +26,8 @@ type Events interface {
 	ListWeekEvent(ctx context.Context, date time.Time) ([]Event, error)
 	ListMonthEvent(ctx context.Context, date time.Time) ([]Event, error)
 	IsTimeBusyEvent(ctx context.Context, userID int, start, stop time.Time, excludeID int) (bool, error)
+	GetEventsReminder(ctx context.Context) ([]Event, error)
+	DeleteEventsBeforeDate(ctx context.Context, date time.Time) error
 }
 
 type Event struct {

@@ -1,48 +1,80 @@
-BIN := "./bin/calendar"
-DOCKER_IMG="calendar:develop"
+### Calendar app automation recieps
+# ¯¯¯¯¯¯¯¯
 
-GIT_HASH := $(shell git log --format="%h" -n 1)
-LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
+.DEFAULT_GOAL := help
 
-build:
-	go build -v -o $(BIN) -ldflags "$(LDFLAGS)" ./cmd/calendar
+SHELL=/bin/bash
+SHELLOPTS:=$(if $(SHELLOPTS),$(SHELLOPTS):)pipefail:errexit
 
-run: build
-	$(BIN) -config ./configs/config.toml
+BIN_CALENDAR := "./bin/calendar"
+BIN_SCHEDULER := "./bin/scheduler"
+BIN_SENDER := "./bin/sender"
+DOCKER_CONTEXT_PATH:=$(shell pwd)
 
-build-img:
-	docker build \
-		--build-arg=LDFLAGS="$(LDFLAGS)" \
-		-t $(DOCKER_IMG) \
-		-f build/Dockerfile .
+help: ## Display this help
+	@IFS=$$'\n'; for line in `grep -h -E '^[a-zA-Z_#-]+:?.*?## .*$$' $(MAKEFILE_LIST)`; do if [ "$${line:0:2}" = "##" ]; then \
+	echo $$line | awk 'BEGIN {FS = "## "}; {printf "\n\033[33m%s\033[0m\n", $$2}'; else \
+	echo $$line | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'; fi; \
+	done; unset IFS;
 
-run-img: build-img
-	docker run $(DOCKER_IMG)
+generate: ## Generate proto files
+	go $@ ./...
 
-version: build
-	$(BIN) version
+build-scheduler:
+	go build -v -o $(BIN_SCHEDULER) -ldflags "$(LDFLAGS)" ./cmd/scheduler
 
-test:
-	go test -v -count=1 -race -timeout=30s ./internal/...
+build-sender:
+	go build -v -o $(BIN_SENDER) -ldflags "$(LDFLAGS)" ./cmd/sender
+
+build-calendar:
+	go build -v -o $(BIN_CALENDAR) -ldflags "$(LDFLAGS)" ./cmd/calendar
+
+build: build-scheduler build-sender build-calendar ## Build application
+
+run-calendar: build-calendar ## Run calendar app
+	source make/.env && $(BIN_CALENDAR) --config ./configs/config.toml
+
+run-scheduler: build-scheduler ## Run scheduler app
+	source make/.env && $(BIN_SCHEDULER) --config ./configs/config_scheduler.toml
+
+run-sender: build-sender ## Run sender app
+	source make/.env && $(BIN_SENDER) --config ./configs/config_sender.toml
+
+version: build  ## Project version
+	$(BIN_CALENDAR) version
+
+test: ## Execute tests
+	go test -race ./...
+
+wait-for-db:
+	sleep 5
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.56.2
 
-lint: install-lint-deps
-	golangci-lint run ./...
+lint: install-lint-deps ## Run liniter
+	golangci-lint run --config=$$(pwd)/../.golangci.yml \
+		--timeout 3m0s \
+		--skip-dirs='/opt/hostedtoolcache/go|/go/pkg/mod' \
+		--path-prefix=hw12_13_14_15_calendar ./...
 
-install-goose:
-ifeq ($(wildcard $(GOOSE_BIN)),)
-	go get -u github.com/pressly/goose/cmd/goose
-	go build -i -o bin/goose github.com/pressly/goose/cmd/goose
-	go mod tidy
-GOOSE_BIN:=bin/goose
-endif
+goose:
+	@(goose --version) || go install github.com/pressly/goose/v3/cmd/goose@latest
 
-migrate-up:
-	goose -dir migrations postgres "host=localhost port=6543 user=postgres password=postgres dbname=postgres sslmode=disable search_path=calendar" up
+define __GOOSE_CMD
+source make/.env && \
+	goose --dir migrations postgres "postgres://$${DB_USERNAME}:$${DB_PASSWORD}@localhost:5532/$${DB_DATABASE}?sslmode=disable"
+endef
 
-generate:
-	go generate ./...
+migrate: ## Update db items
+	$(__GOOSE_CMD) up
 
-.PHONY: build run build-img run-img version test lint generate
+downgrade: ## Downgrade db items
+	$(__GOOSE_CMD) down
+
+migration_status: ## Current migrations status
+	$(__GOOSE_CMD) status
+
+.PHONY: build run version test lint help coverage goose
+
+include make/docker.mk

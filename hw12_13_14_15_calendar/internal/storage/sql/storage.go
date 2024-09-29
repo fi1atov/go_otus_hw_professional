@@ -7,14 +7,17 @@ import (
 	"time"
 
 	"github.com/fi1atov/go_otus_hw_professional/hw12_13_14_15_calendar/internal/storage"
+	// обязательно проинициализировать db driver.
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 type store struct {
-	db *sql.DB
+	dataSourceName string
+	db             *sql.DB
 }
 
-func (s *store) Connect(ctx context.Context, connect string) error {
-	db, err := sql.Open("pgx", connect)
+func (s *store) Connect(ctx context.Context) error {
+	db, err := sql.Open("pgx", s.dataSourceName)
 	if err != nil {
 		return fmt.Errorf("failed to connect to database: %w", err)
 	}
@@ -155,6 +158,21 @@ func (s *store) ListMonthEvent(ctx context.Context, date time.Time) ([]storage.E
 		ORDER BY start
 	`
 	return s.queryList(ctx, query, year, month)
+}
+
+func (s *store) GetEventsReminder(ctx context.Context) ([]storage.Event, error) {
+	query := `
+		SELECT event_id, title, start, stop, description, user_id, notification
+		FROM event
+		WHERE notification IS NULL
+	`
+	return s.queryList(ctx, query)
+}
+
+func (s *store) DeleteEventsBeforeDate(ctx context.Context, date time.Time) error {
+	statement := `DELETE FROM event WHERE stop <= $1`
+	_, err := s.db.ExecContext(ctx, statement, date)
+	return err
 }
 
 func (s *store) queryList(
