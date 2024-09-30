@@ -40,4 +40,15 @@ type Event struct {
 	Notification *time.Duration
 }
 
+func (e *Event) Transfer() Event {
+	return Event{
+		Title:        e.Title,
+		Start:        e.Start,
+		Stop:         e.Stop,
+		Description:  e.Description,
+		UserID:       e.UserID,
+		Notification: e.Notification,
+	}
+}
+
 var ErrNotExistsEvent = errors.New("no such event")
