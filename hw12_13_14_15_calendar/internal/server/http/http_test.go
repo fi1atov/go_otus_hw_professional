@@ -39,7 +39,6 @@ func (s *SuiteTest) SetupTest() {
 		Database: "postgres",
 		User:     "postgres",
 		Password: "postgres",
-		Schema:   "calendar",
 	}
 	s.db, _ = storecreator.New(ctx, &config)
 

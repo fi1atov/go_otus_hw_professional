@@ -8,14 +8,13 @@ import (
 
 func New(conf *storage.Config) storage.Storage {
 	dsn := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s?sslmode=%s&search_path=%s",
+		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		conf.User,
 		conf.Password,
 		conf.Host,
 		conf.Port,
 		conf.Database,
 		conf.Ssl,
-		conf.Schema,
 	)
 
 	return &store{

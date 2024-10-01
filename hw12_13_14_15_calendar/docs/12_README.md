@@ -74,7 +74,7 @@
 и сохранить его в репозиторий;
 Goose создает только файл - sql команды нужно писать самостоятельно. Созданная миграция накатывается командой:
 ```text
-goose -dir migrations postgres "host=localhost port=6543 user=postgres password=postgres dbname=postgres sslmode=disable search_path=calendar" up
+goose -dir migrations postgres "host=localhost port=6543 user=postgres password=postgres dbname=postgres sslmode=disable" up
 ```
 * применять миграции руками или на старте сервиса;
 * вынести настройки подключения к БД в конфиг проекта.

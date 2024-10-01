@@ -2,20 +2,19 @@
 level = "INFO"
 
 [app.http_server]
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = "8080"
 
 [app.grpc_server]
-host = "127.0.0.1"
+host = "0.0.0.0"
 port = "8081"
 
 [app.database]
 inmemory=false
 driver = "postgres"
 host = "localhost"
-port = "6543"
+port = "5432"
 db = "postgres"
 user = "postgres"
 password = "postgres"
 ssl = "disable"
-schema = "calendar"

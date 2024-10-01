@@ -14,7 +14,7 @@ export
 
 define __COMPOSE_CMD
 source $(DOCKER_MAKE_DIR).env && \
-		docker-compose -f $(DOCKER_MAKE_DIR)deployments/docker-compose.app.yml \
+		docker compose -f $(DOCKER_MAKE_DIR)deployments/docker-compose.app.yml \
 		-f $(DOCKER_MAKE_DIR)deployments/docker-compose.yml -p calendar
 endef
 
@@ -29,7 +29,7 @@ bi:
 
 .PHONY: run-img
 build-img:  ## Create docker image
-	docker-compose -f $(DOCKER_MAKE_DIR)deployments/docker-compose.app.yml build
+	docker compose -f $(DOCKER_MAKE_DIR)deployments/docker-compose.app.yml build
 
 .PHONY: build-img
 run-img: build-img  ## Run  app container

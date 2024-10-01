@@ -71,7 +71,7 @@ goose:
 
 define __GOOSE_CMD
 source make/.env && \
-	goose --dir migrations postgres "postgres://$${DB_USERNAME}:$${DB_PASSWORD}@localhost:5532/$${DB_DATABASE}?sslmode=disable"
+	goose --dir migrations postgres "postgres://$${DB_USERNAME}:$${DB_PASSWORD}@localhost:5432/$${DB_DATABASE}?sslmode=disable"
 endef
 
 migrate: ## Update db items
@@ -88,7 +88,7 @@ migration_status: ## Current migrations status
 include make/docker.mk
 
 __integration-t:
-	sleep 3 && ginkgo --repeat=10 -p -v ./pkg/tests -- --scheduler-duration="$(DURATION)"
+	sleep 3 && ginkgo -p -v ./pkg/tests -- --scheduler-duration="$(DURATION)"
 
 integration-tests: DURATION=5s
 
