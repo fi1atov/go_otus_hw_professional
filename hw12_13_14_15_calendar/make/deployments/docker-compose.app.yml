@@ -5,7 +5,7 @@ services:
   migrator:
     build:
       context: ${DOCKER_CONTEXT_PATH}
-      dockerfile: ${DOCKER_MAKE_DIR}/build/migrator/Dockerfile
+      dockerfile: ${DOCKER_MAKE_DIR}/make/build/migrator/Dockerfile
     networks:
       calendar:
 
@@ -19,7 +19,7 @@ services:
       #   - alpine:3.9
       #   - ${DOCKER_REGISTRY}calendar_app
       context: ${DOCKER_CONTEXT_PATH}
-      dockerfile: ${DOCKER_MAKE_DIR}/build/app/Dockerfile
+      dockerfile: ${DOCKER_MAKE_DIR}/make/build/app/Dockerfile
       args:
         DOCKER_BUILDKIT: ${DOCKER_BUILDKIT}
         BIN_FILE: /opt/calendar/calendar-app
@@ -45,7 +45,7 @@ services:
       #   - alpine:3.9
       #   - ${DOCKER_REGISTRY}calendar_sender
       context: ${DOCKER_CONTEXT_PATH}
-      dockerfile: ${DOCKER_MAKE_DIR}/build/app/Dockerfile
+      dockerfile: ${DOCKER_MAKE_DIR}/make/build/app/Dockerfile
       args:
         DOCKER_BUILDKIT: ${DOCKER_BUILDKIT}
         BIN_FILE: /opt/calendar/sender-app
@@ -65,7 +65,7 @@ services:
       #   - alpine:3.9
       #   - ${DOCKER_REGISTRY}calendar_scheduler
       context: ${DOCKER_CONTEXT_PATH}
-      dockerfile: ${DOCKER_MAKE_DIR}/build/app/Dockerfile
+      dockerfile: ${DOCKER_MAKE_DIR}/make/build/app/Dockerfile
       args:
         DOCKER_BUILDKIT: ${DOCKER_BUILDKIT}
         BIN_FILE: /opt/calendar/scheduler-app
