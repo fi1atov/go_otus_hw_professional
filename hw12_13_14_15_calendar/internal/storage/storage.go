@@ -9,5 +9,4 @@ type Config struct {
 	Database string `mapstructure:"db"`
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`
-	Schema   string `mapstructure:"schema"`
 }

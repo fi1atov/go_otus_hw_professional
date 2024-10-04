@@ -9,12 +9,11 @@ err_paths = ["stderr"]
 inmemory=false
 driver = "postgres"
 host = "localhost"
-port = "6543"
+port = "5432"
 db = "postgres"
 user = "postgres"
 password = "postgres"
 ssl = "disable"
-schema = "calendar"
 
 [rmq]
 host = "localhost"
