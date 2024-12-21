@@ -81,7 +81,8 @@ lint: install-lint-deps ## Run liniter
 	golangci-lint run --verbose --config=$$(pwd)/../.golangci.yml \
 		--timeout 10m0s \
 		--skip-dirs='/opt/hostedtoolcache/go|/go/pkg/mod' \
-		--path-prefix=hw12_13_14_15_calendar ./...
+		--path-prefix=hw12_13_14_15_calendar \
+		$(shell git diff --name-only --diff-filter=ACMRT | grep '\.go$$')
 
 goose:
 	@(goose --version) || go install github.com/pressly/goose/v3/cmd/goose@latest
