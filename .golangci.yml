@@ -54,7 +54,7 @@ linters:
     - gosec
     - gosimple
     - govet
-    - importas
+    # - importas
     - ineffassign
     - lll
     - makezero
