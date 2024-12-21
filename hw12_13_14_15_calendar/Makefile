@@ -79,7 +79,7 @@ install-lint-deps:
 
 lint: install-lint-deps ## Run liniter
 	golangci-lint run --verbose --config=$$(pwd)/../.golangci.yml \
-		--timeout 5m0s \
+		--timeout 10m0s \
 		--skip-dirs='/opt/hostedtoolcache/go|/go/pkg/mod' \
 		--path-prefix=hw12_13_14_15_calendar ./...
 
