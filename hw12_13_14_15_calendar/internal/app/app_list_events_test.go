@@ -18,8 +18,8 @@ func (s *ListEventTest) TestList() {
 	event1 := storage.Event{
 		ID:           1,
 		Title:        "Работа",
-		Start:        time.Date(2024, 12, 13, 12, 42, 5, 0, time.UTC),
-		Stop:         time.Date(2024, 12, 13, 13, 0, 0, 0, time.UTC),
+		Start:        time.Date(2025, 12, 13, 12, 42, 5, 0, time.UTC),
+		Stop:         time.Date(2025, 12, 13, 13, 0, 0, 0, time.UTC),
 		Description:  "Пойти поработать",
 		UserID:       1,
 		Notification: nil,
@@ -27,8 +27,8 @@ func (s *ListEventTest) TestList() {
 	event2 := storage.Event{
 		ID:           2,
 		Title:        "Учеба",
-		Start:        time.Date(2024, 12, 13, 17, 42, 5, 0, time.UTC),
-		Stop:         time.Date(2024, 12, 13, 18, 0, 0, 0, time.UTC),
+		Start:        time.Date(2025, 12, 13, 17, 42, 5, 0, time.UTC),
+		Stop:         time.Date(2025, 12, 13, 18, 0, 0, 0, time.UTC),
 		Description:  "Делать домашки",
 		UserID:       1,
 		Notification: nil,
@@ -36,8 +36,8 @@ func (s *ListEventTest) TestList() {
 	event3 := storage.Event{
 		ID:           3,
 		Title:        "Кушать",
-		Start:        time.Date(2024, 12, 14, 9, 13, 17, 0, time.UTC),
-		Stop:         time.Date(2024, 12, 14, 9, 15, 9, 0, time.UTC),
+		Start:        time.Date(2025, 12, 14, 9, 13, 17, 0, time.UTC),
+		Stop:         time.Date(2025, 12, 14, 9, 15, 9, 0, time.UTC),
 		Description:  "Пойти покушать",
 		UserID:       1,
 		Notification: nil,
@@ -45,8 +45,8 @@ func (s *ListEventTest) TestList() {
 	event4 := storage.Event{
 		ID:           4,
 		Title:        "Смотреть сериал",
-		Start:        time.Date(2024, 11, 14, 9, 13, 17, 0, time.UTC),
-		Stop:         time.Date(2024, 11, 14, 9, 15, 9, 0, time.UTC),
+		Start:        time.Date(2025, 11, 14, 9, 13, 17, 0, time.UTC),
+		Stop:         time.Date(2025, 11, 14, 9, 15, 9, 0, time.UTC),
 		Description:  "Смотреть сериал",
 		UserID:       1,
 		Notification: nil,
