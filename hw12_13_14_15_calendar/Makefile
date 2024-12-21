@@ -75,7 +75,7 @@ coverage: postgres-up wait-for-db migrate ## test coverage
 	go tool cover -html coverage.out
 
 install-lint-deps:
-	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.56.2
+	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.62.2
 
 lint: install-lint-deps ## Run liniter
 	golangci-lint run --verbose --config=$$(pwd)/../.golangci.yml \
