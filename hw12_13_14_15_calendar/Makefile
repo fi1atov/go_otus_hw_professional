@@ -78,8 +78,8 @@ install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.56.2
 
 lint: install-lint-deps ## Run liniter
-	golangci-lint run --config=$$(pwd)/../.golangci.yml \
-		--timeout 3m0s \
+	golangci-lint run --verbose --config=$$(pwd)/../.golangci.yml \
+		--timeout 5m0s \
 		--skip-dirs='/opt/hostedtoolcache/go|/go/pkg/mod' \
 		--path-prefix=hw12_13_14_15_calendar ./...
 
