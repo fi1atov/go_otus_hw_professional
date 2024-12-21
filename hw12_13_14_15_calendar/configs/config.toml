@@ -12,8 +12,10 @@ port = "8081"
 [app.database]
 inmemory=false
 driver = "postgres"
-host = "localhost"
-port = "5432"
+# host = "localhost"
+host = "postgres-service"
+# port = "5432"
+port = "5437"
 db = "postgres"
 user = "postgres"
 password = "postgres"
